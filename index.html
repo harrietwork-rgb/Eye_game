@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Colour Focus – Perception Test</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+    :root {
+        --accent: #2563eb;
+        --accent-soft: #dbeafe;
+        --text-main: #111827;
+        --text-soft: #4b5563;
+        --bg: #ffffff;
+        --box-bg: #f9fafb;
+        --border: #e5e7eb;
+    }
+
+    body.dark {
+        --accent: #60a5fa;
+        --accent-soft: #1e3a8a;
+        --text-main: #f3f4f6;
+        --text-soft: #cbd5e1;
+        --bg: #0f172a;
+        --box-bg: #1e293b;
+        --border: #334155;
+    }
+
+    body {
+        margin: 0;
+        background: var(--bg);
+        font-family: system-ui, sans-serif;
+        color: var(--text-main);
+        display: flex;
+        justify-content: center;
+        padding: 20px;
+        transition: background 0.3s, color 0.3s;
+    }
+    .app {
+        width: 100%;
+        max-width: 420px;
+        background: var(--bg);
+        padding: 16px;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+        border: 1px solid var(--border);
+        transition: background 0.3s, border 0.3s;
+    }
+    header {
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 10px;
+        position: relative;
+    }
+    h1 {
+        font-size: 20px;
+        margin: 0 0 4px;
+    }
+    .subtitle {
+        font-size: 13px;
+        color: var(--text-soft);
+    }
+
+    #theme-toggle {
+        position: absolute;
+        right: 0;
+        top: 0;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: var(--box-bg);
+        border: 1px solid var(--border);
+        cursor: pointer;
+        font-size: 16px;
+        transition: background 0.3s, color 0.3s;
+    }
+
+    .top-row {
+        display: flex;
+        justify-content: space-between;
+        margin: 12px 0;
+    }
+    .box {
+        background: var(--box-bg);
+        padding: 10px;
+        border-radius: 12px;
+        width: 48%;
+        text-align: center;
+        border: 1px solid var(--border);
+        transition: background 0.3s, border 0.3s;
+    }
+    .box-label {
+        font-size: 12px;
+        color: var(--text-soft);
+        margin-bottom: 4px;
+    }
+    #timer-value {
+        font-size: 24px;
+        font-weight: 600;
+        color: var(--accent);
+    }
+    #score-value, #best-score-value, #best-level-value {
+        font-size: 20px;
+        font-weight: 600;
+    }
+
+    .mid-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+    .mid-box {
+        flex: 1;
+        background: var(--box-bg);
+        border-radius: 10px;
+        padding: 8px;
+        border: 1px solid var(--border);
+        text-align: center;
+        font-size: 13px;
+        transition: background 0.3s, border 0.3s;
+    }
+    #accuracy {
+        font-size: 13px;
+        color: var(--text-soft);
+    }
+    #lives {
+        font-size: 20px;
+    }
+
+    #level-label {
+        font-size: 14px;
+        margin: 6px 0 4px;
+        color: var(--text-soft);
+    }
+
+    .grid {
+        display: grid;
+        gap: 6px;
+        margin: 10px 0 14px;
+    }
+    .tile {
+        width: 100%;
+        padding-bottom: 100%;
+        border-radius: 8px;
+        cursor: pointer;
+        border: 1px solid var(--border);
+        transition: border 0.3s;
+    }
+
+    .controls {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+    button {
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+    .primary {
+        background: var(--accent);
+        color: #ffffff;
+    }
+    .ghost {
+        background: var(--box-bg);
+        color: var(--text-main);
+        border: 1px solid var(--border);
+    }
+
+    #pause-overlay, #results-overlay, #leaderboard-overlay,
+    #name-overlay, #profile-overlay, #achievements-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.12);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+    .overlay-card {
+        background: var(--box-bg);
+        border-radius: 16px;
+        padding: 18px 16px;
+        max-width: 360px;
+        width: 100%;
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+        border: 1px solid var(--border);
+        text-align: center;
+        transition: background 0.3s, border 0.3s;
+    }
+    .overlay-card h2 {
+        margin: 0 0 6px;
+        font-size: 18px;
+    }
+    .overlay-card p {
+        margin: 4px 0;
+        font-size: 13px;
+        color: var(--text-soft);
+    }
+    .overlay-card button {
+        margin-top: 10px;
+    }
+
+    .rank-pill {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: #111827;
+    }
+    .rank-bronze { background: #d97757; color: #111827; }
+    .rank-silver { background: #e5e7eb; color: #111827; }
+    .rank-gold { background: #facc15; color: #111827; }
+    .rank-diamond { background: #bfdbfe; color: #1e3a8a; }
+    .rank-master { background: #c4b5fd; color: #4c1d95; }
+
+    .lb-meta {
+        font-size: 12px;
+        color: var(--text-soft);
+        margin-bottom: 8px;
+    }
+
+    .lb-tabs {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 10px;
+    }
+    .lb-tab {
+        flex: 1;
+        padding: 6px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--box-bg);
+        color: var(--text-main);
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    .lb-tab.active {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+    }
+    .lb-panel {
+        display: none;
+    }
+    .lb-panel.active {
+        display: block;
+    }
+    .lb-runs {
+        margin-top: 8px;
+        max-height: 220px;
+        overflow-y: auto;
+        text-align: left;
+        font-size: 12px;
+    }
+    .lb-global-list {
+        margin-top: 8px;
+        max-height: 260px;
+        overflow-y: auto;
+        text-align: left;
+        font-size: 12px;
+    }
+    .lb-global-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 4px;
+        border-bottom: 1px solid var(--border);
+    }
+    .lb-global-row:last-child {
+        border-bottom: none;
+    }
+    .lb-global-rank {
+        font-weight: 700;
+        min-width: 22px;
+        color: var(--text-soft);
+        font-size: 11px;
+    }
+    .lb-global-rank.top1 { color: #facc15; }
+    .lb-global-rank.top2 { color: #9ca3af; }
+    .lb-global-rank.top3 { color: #d97757; }
+    .lb-global-name {
+        flex: 1;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .lb-global-name.me {
+        color: var(--accent);
+    }
+    .lb-global-score {
+        font-weight: 700;
+        white-space: nowrap;
+    }
+    .lb-global-level {
+        color: var(--text-soft);
+        font-size: 11px;
+        white-space: nowrap;
+    }
+    .lb-loading {
+        color: var(--text-soft);
+        font-size: 12px;
+        padding: 12px 0;
+        text-align: center;
+    }
+    .lb-run-row {
+        margin: 4px 0;
+    }
+    .lb-run-label {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 2px;
+        gap: 4px;
+    }
+    .lb-run-label span {
+        white-space: nowrap;
+    }
+    .lb-run-label span:last-child {
+        margin-left: auto;
+    }
+    .lb-bar-outer {
+        width: 100%;
+        height: 8px;
+        border-radius: 999px;
+        background: #e5e7eb;
+        overflow: hidden;
+    }
+    .lb-bar-inner {
+        height: 100%;
+        border-radius: 999px;
+    }
+
+    .name-input {
+        width: 100%;
+        padding: 8px 10px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        font-size: 14px;
+        margin-top: 8px;
+        box-sizing: border-box;
+        background: var(--bg);
+        color: var(--text-main);
+    }
+
+    .profile-list {
+        margin-top: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    .profile-btn {
+        width: 100%;
+        text-align: left;
+        padding: 8px 10px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: var(--box-bg);
+        cursor: pointer;
+        font-size: 14px;
+    }
+    .profile-btn.active {
+        border-color: var(--accent);
+        background: var(--accent-soft);
+    }
+
+    .ach-list {
+        margin-top: 10px;
+        max-height: 260px;
+        overflow-y: auto;
+        text-align: left;
+        font-size: 13px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .medal-card {
+        border-radius: 12px;
+        padding: 10px 12px;
+        color: #111827;
+        box-shadow: 0 4px 10px rgba(15, 23, 42, 0.15);
+    }
+    .medal-gold {
+        background: #facc15;
+    }
+    .medal-silver {
+        background: #e5e7eb;
+    }
+    .medal-bronze {
+        background: #d97757;
+    }
+    .medal-title {
+        font-weight: 700;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .medal-date {
+        font-size: 12px;
+        opacity: 0.9;
+    }
+</style>
+</head>
+
+<body>
+<div class="app">
+    <header>
+        <h1>Colour Focus</h1>
+        <div class="subtitle">Tap the lighter square as quickly and accurately as you can.</div>
+        <button id="theme-toggle">🌙</button>
+    </header>
+
+    <div class="top-row">
+        <div class="box">
+            <div class="box-label">Best Score</div>
+            <div id="best-score-value">0</div>
+        </div>
+        <div class="box">
+            <div class="box-label">Best Level</div>
+            <div id="best-level-value">1</div>
+        </div>
+    </div>
+
+    <div class="top-row">
+        <div class="box">
+            <div class="box-label">Time</div>
+            <div id="timer-value">01:00</div>
+        </div>
+        <div class="box">
+            <div class="box-label">Score</div>
+            <div id="score-value">0</div>
+        </div>
+    </div>
+
+    <div class="mid-row">
+        <div class="mid-box">
+            <div class="box-label">Accuracy</div>
+            <div id="accuracy">0% (0 / 0)</div>
+        </div>
+        <div class="mid-box">
+            <div class="box-label">Lives</div>
+            <div id="lives">❤️❤️❤️</div>
+        </div>
+    </div>
+
+    <div id="level-label">Level 1</div>
+    <div id="grid" class="grid"></div>
+
+    <div class="controls">
+        <button id="pause-btn" class="ghost">Pause</button>
+        <button id="restart-btn" class="ghost">Restart</button>
+        <button id="start-btn" class="primary">Play</button>
+        <button id="leaderboard-btn" class="ghost">Leaderboard</button>
+        <button id="achievements-btn" class="ghost">Achievements</button>
+    </div>
+</div>
+
+<div id="pause-overlay">
+    <div class="overlay-card">
+        <h2>Paused</h2>
+        <p>Take a breather. Tap continue when you're ready.</p>
+        <button id="continue-btn" class="primary">Continue</button>
+    </div>
+</div>
+
+<div id="results-overlay">
+    <div class="overlay-card">
+        <h2>Results</h2>
+        <p id="results-score"></p>
+        <p id="results-accuracy"></p>
+        <p id="results-level"></p>
+        <p id="results-best"></p>
+        <button id="play-again-btn" class="primary">Play Again</button>
+    </div>
+</div>
+
+<div id="leaderboard-overlay">
+    <div class="overlay-card">
+        <h2>Leaderboard</h2>
+        <div class="lb-tabs">
+            <button class="lb-tab active" id="lb-tab-my" onclick="switchLbTab('my')">My Week</button>
+            <button class="lb-tab" id="lb-tab-global" onclick="switchLbTab('global')">Global</button>
+        </div>
+
+        <!-- My Week panel -->
+        <div id="lb-panel-my" class="lb-panel active">
+            <div id="lb-rank-pill" class="rank-pill rank-bronze">BRONZE</div>
+            <p id="lb-best"></p>
+            <p id="lb-reset"></p>
+            <p id="lb-username"></p>
+            <div class="lb-meta">Last 10 runs this week:</div>
+            <div id="lb-runs" class="lb-runs"></div>
+        </div>
+
+        <!-- Global panel -->
+        <div id="lb-panel-global" class="lb-panel">
+            <p style="font-size:12px;color:var(--text-soft);margin:0 0 4px">Top players this week across all devices</p>
+            <div id="lb-global-list" class="lb-global-list">
+                <div class="lb-loading">Loading…</div>
+            </div>
+        </div>
+
+        <button id="lb-name-btn" class="ghost">Change name</button>
+        <button id="lb-profile-btn" class="ghost">Switch profile</button>
+        <button id="lb-close-btn" class="primary">Close</button>
+    </div>
+</div>
+
+<div id="name-overlay">
+    <div class="overlay-card">
+        <h2>Set Your Name</h2>
+        <p>Choose the name that appears on your leaderboard.</p>
+        <input id="name-input" class="name-input" maxlength="20" />
+        <button id="name-save-btn" class="primary">Save</button>
+    </div>
+</div>
+
+<div id="profile-overlay">
+    <div class="overlay-card">
+        <h2>Select Profile</h2>
+        <p>You can have up to 3 profiles on this device.</p>
+        <div id="profile-list" class="profile-list"></div>
+        <button id="add-profile-btn" class="ghost">Add profile</button>
+        <button id="profile-close-btn" class="primary">Close</button>
+    </div>
+</div>
+
+<div id="achievements-overlay">
+    <div class="overlay-card">
+        <h2>Achievements</h2>
+        <p>Your permanent weekly medals.</p>
+        <div id="ach-list" class="ach-list"></div>
+        <button id="ach-close-btn" class="primary">Close</button>
+    </div>
+</div>
+
+<script>
+/* GAME STATE */
+let level = 1;
+let score = 0;
+let correct = 0;
+let wrong = 0;
+let lives = 3;
+
+let bestScore = 0;
+let bestLevel = 1;
+
+let sessionSeconds = 60;
+let sessionRemaining = sessionSeconds;
+let sessionTimer = null;
+
+let gameActive = false;
+let paused = false;
+let oddIndex = -1;
+let lastClickTime = null;
+
+/* PROFILE / DATA STATE */
+let profilesData = null;
+let currentProfile = null;
+
+/* ELEMENTS */
+const gridEl = document.getElementById("grid");
+const timerValueEl = document.getElementById("timer-value");
+const scoreValueEl = document.getElementById("score-value");
+const bestScoreValueEl = document.getElementById("best-score-value");
+const bestLevelValueEl = document.getElementById("best-level-value");
+const levelLabelEl = document.getElementById("level-label");
+const accuracyEl = document.getElementById("accuracy");
+const livesEl = document.getElementById("lives");
+
+const pauseOverlay = document.getElementById("pause-overlay");
+const resultsOverlay = document.getElementById("results-overlay");
+const leaderboardOverlay = document.getElementById("leaderboard-overlay");
+const nameOverlay = document.getElementById("name-overlay");
+const profileOverlay = document.getElementById("profile-overlay");
+const achievementsOverlay = document.getElementById("achievements-overlay");
+
+const pauseBtn = document.getElementById("pause-btn");
+const continueBtn = document.getElementById("continue-btn");
+const startBtn = document.getElementById("start-btn");
+const restartBtn = document.getElementById("restart-btn");
+const playAgainBtn = document.getElementById("play-again-btn");
+const leaderboardBtn = document.getElementById("leaderboard-btn");
+const achievementsBtn = document.getElementById("achievements-btn");
+const lbCloseBtn = document.getElementById("lb-close-btn");
+const lbNameBtn = document.getElementById("lb-name-btn");
+const lbProfileBtn = document.getElementById("lb-profile-btn");
+
+const themeToggle = document.getElementById("theme-toggle");
+
+const resultsScore = document.getElementById("results-score");
+const resultsAccuracy = document.getElementById("results-accuracy");
+const resultsLevel = document.getElementById("results-level");
+const resultsBest = document.getElementById("results-best");
+
+const lbRankPill = document.getElementById("lb-rank-pill");
+const lbBest = document.getElementById("lb-best");
+const lbReset = document.getElementById("lb-reset");
+const lbRuns = document.getElementById("lb-runs");
+const lbUsername = document.getElementById("lb-username");
+
+const nameInput = document.getElementById("name-input");
+const nameSaveBtn = document.getElementById("name-save-btn");
+
+const profileListEl = document.getElementById("profile-list");
+const addProfileBtn = document.getElementById("add-profile-btn");
+const profileCloseBtn = document.getElementById("profile-close-btn");
+
+const achListEl = document.getElementById("ach-list");
+const achCloseBtn = document.getElementById("ach-close-btn");
+
+/* DARK MODE */
+if (localStorage.getItem("colourFocusTheme") === "dark") {
+    document.body.classList.add("dark");
+    themeToggle.textContent = "☀️";
+}
+themeToggle.onclick = () => {
+    document.body.classList.toggle("dark");
+    if (document.body.classList.contains("dark")) {
+        themeToggle.textContent = "☀️";
+        localStorage.setItem("colourFocusTheme", "dark");
+    } else {
+        themeToggle.textContent = "🌙";
+        localStorage.setItem("colourFocusTheme", "light");
+    }
+};
+
+/* PROFILE SYSTEM */
+function createRandomUsername() {
+    const rand = Math.floor(1000 + Math.random() * 9000);
+    return `CF-${rand}`;
+}
+
+function createNewProfile() {
+    const id = "p" + Date.now() + Math.floor(Math.random() * 1000);
+    return {
+        id,
+        username: createRandomUsername(),
+        bestScore: 0,
+        bestLevel: 1,
+        weekly: {
+            weekStart: Date.now(),
+            bestScore: 0,
+            bestLevel: 1,
+            runs: []
+        },
+        achievements: []
+    };
+}
+
+function loadProfiles() {
+    const raw = localStorage.getItem("colourFocusProfiles");
+    if (raw) {
+        try {
+            profilesData = JSON.parse(raw);
+        } catch {
+            profilesData = null;
+        }
+    }
+    if (!profilesData || !profilesData.profiles || Object.keys(profilesData.profiles).length === 0) {
+        const profile = createNewProfile();
+        profilesData = {
+            activeId: profile.id,
+            profiles: {
+                [profile.id]: profile
+            }
+        };
+    }
+    if (!profilesData.activeId || !profilesData.profiles[profilesData.activeId]) {
+        const firstId = Object.keys(profilesData.profiles)[0];
+        profilesData.activeId = firstId;
+    }
+    currentProfile = profilesData.profiles[profilesData.activeId];
+    saveProfiles();
+    applyProfileToUI();
+    initWeeklyForCurrentProfile();
+}
+
+function saveProfiles() {
+    localStorage.setItem("colourFocusProfiles", JSON.stringify(profilesData));
+}
+
+function setActiveProfile(id) {
+    if (!profilesData.profiles[id]) return;
+    profilesData.activeId = id;
+    currentProfile = profilesData.profiles[id];
+    saveProfiles();
+    applyProfileToUI();
+    initWeeklyForCurrentProfile();
+}
+
+function applyProfileToUI() {
+    bestScore = currentProfile.bestScore || 0;
+    bestLevel = currentProfile.bestLevel || 1;
+    bestScoreValueEl.textContent = bestScore;
+    bestLevelValueEl.textContent = bestLevel;
+}
+
+function renderProfileList() {
+    profileListEl.innerHTML = "";
+    const ids = Object.keys(profilesData.profiles);
+    ids.forEach(id => {
+        const p = profilesData.profiles[id];
+        const btn = document.createElement("button");
+        btn.className = "profile-btn";
+        if (id === profilesData.activeId) btn.classList.add("active");
+        btn.textContent = p.username;
+        btn.onclick = () => {
+            setActiveProfile(id);
+            renderProfileList();
+        };
+        profileListEl.appendChild(btn);
+    });
+
+    const count = ids.length;
+    if (count >= 3) {
+        addProfileBtn.style.display = "none";
+    } else {
+        addProfileBtn.style.display = "block";
+    }
+}
+
+function showProfileOverlay() {
+    renderProfileList();
+    profileOverlay.style.display = "flex";
+}
+
+function hideProfileOverlay() {
+    profileOverlay.style.display = "none";
+}
+
+/* WEEKLY + MEDALS */
+function getCurrentWeekStartMs() {
+    const now = new Date();
+    const day = now.getUTCDay();
+    const diff = day === 0 ? -6 : 1 - day;
+    const monday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + diff));
+    return monday.getTime();
+}
+
+function initWeeklyForCurrentProfile() {
+    const weekStartMs = getCurrentWeekStartMs();
+    if (!currentProfile.weekly || typeof currentProfile.weekly.weekStart !== "number") {
+        currentProfile.weekly = {
+            weekStart: weekStartMs,
+            bestScore: 0,
+            bestLevel: 1,
+            runs: []
+        };
+        saveProfiles();
+        return;
+    }
+    const w = currentProfile.weekly;
+    if (w.weekStart < weekStartMs) {
+        awardMedalsForWeek(currentProfile);
+        currentProfile.weekly = {
+            weekStart: weekStartMs,
+            bestScore: 0,
+            bestLevel: 1,
+            runs: []
+        };
+        saveProfiles();
+    }
+}
+
+function awardMedalsForWeek(profile) {
+    const w = profile.weekly;
+    if (!w || !w.runs || w.runs.length === 0) return;
+    const sorted = [...w.runs].sort((a, b) => b.score - a.score);
+    const medals = ["gold", "silver", "bronze"];
+    if (!profile.achievements) profile.achievements = [];
+    for (let i = 0; i < 3 && i < sorted.length; i++) {
+        profile.achievements.push({
+            medal: medals[i],
+            weekStart: w.weekStart
+        });
+    }
+}
+
+function recordWeeklyRun(score, level, pct) {
+    const w = currentProfile.weekly;
+    if (!w) return;
+    if (score > w.bestScore) w.bestScore = score;
+    if (level > w.bestLevel) w.bestLevel = level;
+    w.runs.push({
+        score,
+        level,
+        accuracy: pct,
+        date: new Date().toISOString().slice(0, 10),
+        name: currentProfile.username
+    });
+    if (w.runs.length > 10) {
+        w.runs = w.runs.slice(w.runs.length - 10);
+    }
+    saveProfiles();
+    submitRunToGlobalLeaderboard(score, level, pct);
+}
+
+/* HELPERS */
+function formatTime(sec) {
+    return `00:${sec.toString().padStart(2, "0")}`;
+}
+
+function updateAccuracy() {
+    const total = correct + wrong;
+    const pct = total === 0 ? 0 : Math.round((correct / total) * 100);
+    accuracyEl.textContent = `${pct}% (${correct} / ${total})`;
+}
+
+function updateLives() {
+    livesEl.textContent = "❤️".repeat(lives) + "🤍".repeat(3 - lives);
+}
+
+function getGridSize(level) {
+    if (level <= 2) return 2;
+    if (level <= 4) return 3;
+    if (level <= 7) return 4;
+    if (level <= 11) return 5;
+    return 6;
+}
+
+function getDelta(level) {
+    const start = 14, end = 3;
+    const t = Math.min(level - 1, 20) / 20;
+    return start - t * (start - end);
+}
+
+function hsl(h, s, l) {
+    return `hsl(${h}, ${s}%, ${l}%)`;
+}
+
+/* SCORING */
+function addScoreForCorrectClick() {
+    const now = performance.now();
+    let rtMs = 500;
+    if (lastClickTime !== null) rtMs = now - lastClickTime;
+    lastClickTime = now;
+
+    const base = level * 5;
+    const speedBonus = Math.max(0, 50 - rtMs / 20);
+
+    const gained = Math.round(base + speedBonus);
+    score += gained;
+    scoreValueEl.textContent = score;
+
+    if (score > bestScore) {
+        bestScore = score;
+        bestScoreValueEl.textContent = bestScore;
+        currentProfile.bestScore = bestScore;
+        saveProfiles();
+    }
+}
+
+/* PUZZLE */
+function createPuzzle() {
+    const size = getGridSize(level);
+    gridEl.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+    gridEl.innerHTML = "";
+
+    const baseH = Math.floor(Math.random() * 360);
+    const baseS = 40 + Math.random() * 30;
+    const baseL = 30 + Math.random() * 25;
+
+    const delta = getDelta(level);
+    const oddL = Math.min(baseL + delta, 95);
+    const oddH = (baseH + (Math.random() - 0.5) * 6 + 360) % 360;
+
+    const baseCol = hsl(baseH, baseS, baseL);
+    const oddCol = hsl(oddH, baseS, oddL);
+
+    const total = size * size;
+    oddIndex = Math.floor(Math.random() * total);
+
+    for (let i = 0; i < total; i++) {
+        const tile = document.createElement("div");
+        tile.className = "tile";
+        tile.style.background = i === oddIndex ? oddCol : baseCol;
+        tile.dataset.index = i;
+        tile.onclick = onTileClick;
+        gridEl.appendChild(tile);
+    }
+
+    levelLabelEl.textContent = `Level ${level}`;
+}
+
+function onTileClick(e) {
+    if (!gameActive || paused) return;
+
+    const index = parseInt(e.target.dataset.index);
+    const correctTile = index === oddIndex;
+
+    if (correctTile) {
+        correct++;
+        addScoreForCorrectClick();
+    } else {
+        wrong++;
+        lives--;
+        updateLives();
+        if (lives <= 0) {
+            endSession();
+            return;
+        }
+    }
+
+    updateAccuracy();
+
+    level++;
+    if (level > bestLevel) {
+        bestLevel = level;
+        bestLevelValueEl.textContent = bestLevel;
+        currentProfile.bestLevel = bestLevel;
+        saveProfiles();
+    }
+
+    createPuzzle();
+}
+
+/* TIMER + SESSION */
+function updateTimer() {
+    timerValueEl.textContent = formatTime(sessionRemaining);
+}
+
+function startSession() {
+    if (gameActive) return;
+
+    gameActive = true;
+    paused = false;
+
+    level = 1;
+    score = 0;
+    correct = 0;
+    wrong = 0;
+    lives = 3;
+    lastClickTime = performance.now();
+
+    updateLives();
+    updateAccuracy();
+
+    sessionRemaining = sessionSeconds;
+    updateTimer();
+    scoreValueEl.textContent = "0";
+
+    resultsOverlay.style.display = "none";
+
+    if (sessionTimer) clearInterval(sessionTimer);
+    sessionTimer = setInterval(() => {
+        if (!paused) {
+            sessionRemaining--;
+            updateTimer();
+            if (sessionRemaining <= 0) {
+                endSession();
+            }
+        }
+    }, 1000);
+
+    createPuzzle();
+}
+
+function endSession() {
+    if (!gameActive) return;
+    gameActive = false;
+    clearInterval(sessionTimer);
+
+    const total = correct + wrong;
+    const pct = total === 0 ? 0 : Math.round((correct / total) * 100);
+
+    resultsScore.textContent = `Score: ${score}`;
+    resultsAccuracy.textContent = `Accuracy: ${pct}% (${correct} / ${total})`;
+    resultsLevel.textContent = `Level reached: ${level}`;
+    resultsBest.textContent = `Best Score: ${bestScore} • Best Level: ${bestLevel}`;
+
+    recordWeeklyRun(score, level, pct);
+
+    resultsOverlay.style.display = "flex";
+}
+
+/* RANK + LEADERBOARD */
+function getRank(score) {
+    if (score >= 10000) return "MASTER";
+    if (score >= 7000) return "DIAMOND";
+    if (score >= 5000) return "GOLD";
+    if (score >= 3000) return "SILVER";
+    return "BRONZE";
+}
+
+function applyRankPill(rank) {
+    lbRankPill.className = "rank-pill";
+    if (rank === "MASTER") lbRankPill.classList.add("rank-master");
+    else if (rank === "DIAMOND") lbRankPill.classList.add("rank-diamond");
+    else if (rank === "GOLD") lbRankPill.classList.add("rank-gold");
+    else if (rank === "SILVER") lbRankPill.classList.add("rank-silver");
+    else lbRankPill.classList.add("rank-bronze");
+    lbRankPill.textContent = rank;
+}
+
+function formatResetTime() {
+    const now = Date.now();
+    // Next Monday 00:00 UTC
+    const d = new Date();
+    const dayOfWeek = d.getUTCDay();
+    const daysUntilMonday = dayOfWeek === 0 ? 1 : (8 - dayOfWeek) % 7 || 7;
+    const next = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + daysUntilMonday));
+    const diff = Math.max(0, next.getTime() - now);
+
+    const days = Math.floor(diff / (24 * 60 * 60 * 1000));
+    const hours = Math.floor((diff % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+
+    return `Resets in ${days} day${days !== 1 ? "s" : ""}, ${hours} hour${hours !== 1 ? "s" : ""}`;
+}
+
+/* GLOBAL LEADERBOARD */
+let currentLbTab = "my";
+
+function switchLbTab(tab) {
+    currentLbTab = tab;
+    document.getElementById("lb-tab-my").classList.toggle("active", tab === "my");
+    document.getElementById("lb-tab-global").classList.toggle("active", tab === "global");
+    document.getElementById("lb-panel-my").classList.toggle("active", tab === "my");
+    document.getElementById("lb-panel-global").classList.toggle("active", tab === "global");
+    if (tab === "global") {
+        loadGlobalLeaderboard();
+    }
+}
+
+async function loadGlobalLeaderboard() {
+    const listEl = document.getElementById("lb-global-list");
+    listEl.innerHTML = '<div class="lb-loading">Loading…</div>';
+    try {
+        const res = await fetch("/api/leaderboard");
+        if (!res.ok) throw new Error("Failed to load");
+        const data = await res.json();
+        renderGlobalLeaderboard(data.entries || []);
+    } catch {
+        listEl.innerHTML = '<div class="lb-loading">Could not load global rankings.</div>';
+    }
+}
+
+function renderGlobalLeaderboard(entries) {
+    const listEl = document.getElementById("lb-global-list");
+    listEl.innerHTML = "";
+
+    if (entries.length === 0) {
+        listEl.innerHTML = '<div class="lb-loading">No scores yet this week. Be the first!</div>';
+        return;
+    }
+
+    const myId = currentProfile.id;
+
+    entries.forEach((entry, i) => {
+        const rank = i + 1;
+        const row = document.createElement("div");
+        row.className = "lb-global-row";
+
+        const rankEl = document.createElement("span");
+        rankEl.className = "lb-global-rank";
+        if (rank === 1) { rankEl.textContent = "🥇"; rankEl.classList.add("top1"); }
+        else if (rank === 2) { rankEl.textContent = "🥈"; rankEl.classList.add("top2"); }
+        else if (rank === 3) { rankEl.textContent = "🥉"; rankEl.classList.add("top3"); }
+        else rankEl.textContent = `#${rank}`;
+
+        const nameEl = document.createElement("span");
+        nameEl.className = "lb-global-name";
+        if (entry.playerId === myId) nameEl.classList.add("me");
+        nameEl.textContent = entry.username;
+
+        const scoreEl = document.createElement("span");
+        scoreEl.className = "lb-global-score";
+        scoreEl.textContent = entry.bestScore.toLocaleString();
+
+        const levelEl = document.createElement("span");
+        levelEl.className = "lb-global-level";
+        levelEl.textContent = `L${entry.bestLevel}`;
+
+        row.appendChild(rankEl);
+        row.appendChild(nameEl);
+        row.appendChild(scoreEl);
+        row.appendChild(levelEl);
+        listEl.appendChild(row);
+    });
+}
+
+async function submitRunToGlobalLeaderboard(score, level, accuracy) {
+    try {
+        await fetch("/api/leaderboard", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                playerId: currentProfile.id,
+                username: currentProfile.username,
+                score,
+                level,
+                accuracy,
+            }),
+        });
+    } catch {
+        // Non-blocking — local data is still saved
+    }
+}
+
+function renderLeaderboard() {
+    const w = currentProfile.weekly;
+    const rank = getRank(w.bestScore || 0);
+    applyRankPill(rank);
+
+    lbBest.textContent = `Weekly best: ${w.bestScore} pts • Level ${w.bestLevel}`;
+    lbReset.textContent = formatResetTime();
+    lbUsername.textContent = `Current name: ${currentProfile.username}`;
+
+    lbRuns.innerHTML = "";
+    if (!w.runs || w.runs.length === 0) {
+        lbRuns.textContent = "No runs yet this week. Play a game to start filling this in.";
+        return;
+    }
+
+    const maxScore = Math.max(...w.runs.map(r => r.score), 1);
+
+    w.runs.forEach((run, idx) => {
+        const row = document.createElement("div");
+        row.className = "lb-run-row";
+
+        const label = document.createElement("div");
+        label.className = "lb-run-label";
+        const runIndex = w.runs.length - idx;
+        label.innerHTML = `<span>Run ${runIndex}</span><span>${run.name || "Player"} • ${run.score} pts • L${run.level} • ${run.accuracy}%</span>`;
+
+        const barOuter = document.createElement("div");
+        barOuter.className = "lb-bar-outer";
+
+        const barInner = document.createElement("div");
+        barInner.className = "lb-bar-inner";
+        const width = Math.max(5, (run.score / maxScore) * 100);
+        barInner.style.width = width + "%";
+
+        let color = "#f97373";
+        if (run.accuracy >= 80) color = "#22c55e";
+        else if (run.accuracy >= 60) color = "#eab308";
+        barInner.style.background = color;
+
+        barOuter.appendChild(barInner);
+        row.appendChild(label);
+        row.appendChild(barOuter);
+        lbRuns.appendChild(row);
+    });
+}
+
+/* ACHIEVEMENTS */
+function formatWeekLabel(weekStart) {
+    const d = new Date(weekStart);
+    const options = { day: "numeric", month: "long", year: "numeric" };
+    return "Week of " + d.toLocaleDateString(undefined, options);
+}
+
+function renderAchievements() {
+    achListEl.innerHTML = "";
+    const ach = currentProfile.achievements || [];
+    if (ach.length === 0) {
+        achListEl.textContent = "No medals yet. Place in the top 3 of a week to earn one.";
+        return;
+    }
+
+    ach.slice().reverse().forEach(entry => {
+        const card = document.createElement("div");
+        card.className = "medal-card";
+        let icon = "🥉";
+        let label = "BRONZE MEDAL";
+        card.classList.add("medal-bronze");
+        if (entry.medal === "gold") {
+            icon = "🥇";
+            label = "GOLD MEDAL";
+            card.classList.remove("medal-bronze");
+            card.classList.add("medal-gold");
+        } else if (entry.medal === "silver") {
+            icon = "🥈";
+            label = "SILVER MEDAL";
+            card.classList.remove("medal-bronze");
+            card.classList.add("medal-silver");
+        }
+
+        const title = document.createElement("div");
+        title.className = "medal-title";
+        title.textContent = `${icon} ${label}`;
+
+        const date = document.createElement("div");
+        date.className = "medal-date";
+        date.textContent = formatWeekLabel(entry.weekStart);
+
+        card.appendChild(title);
+        card.appendChild(date);
+        achListEl.appendChild(card);
+    });
+}
+
+/* NAME HANDLING */
+function setUsername(newName) {
+    const trimmed = newName.trim();
+    if (trimmed.length === 0) return;
+    currentProfile.username = trimmed;
+    saveProfiles();
+}
+
+/* PAUSE / CONTROLS */
+function pauseGame() {
+    if (!gameActive || paused) return;
+    paused = true;
+    pauseOverlay.style.display = "flex";
+}
+
+function continueGame() {
+    if (!paused) return;
+    paused = false;
+    pauseOverlay.style.display = "none";
+}
+
+/* BUTTONS */
+startBtn.onclick = startSession;
+restartBtn.onclick = () => { gameActive = false; startSession(); };
+pauseBtn.onclick = pauseGame;
+continueBtn.onclick = continueGame;
+playAgainBtn.onclick = startSession;
+
+leaderboardBtn.onclick = () => {
+    initWeeklyForCurrentProfile();
+    switchLbTab("my");
+    renderLeaderboard();
+    leaderboardOverlay.style.display = "flex";
+};
+lbCloseBtn.onclick = () => {
+    leaderboardOverlay.style.display = "none";
+};
+
+lbNameBtn.onclick = () => {
+    nameInput.value = currentProfile.username || "";
+    nameOverlay.style.display = "flex";
+};
+nameSaveBtn.onclick = () => {
+    const val = nameInput.value;
+    if (val.trim().length > 0) {
+        setUsername(val);
+    }
+    nameOverlay.style.display = "none";
+};
+
+nameOverlay.addEventListener("click", (e) => {
+    if (e.target === nameOverlay) {
+        nameOverlay.style.display = "none";
+    }
+});
+
+/* PROFILE BUTTONS */
+lbProfileBtn.onclick = () => {
+    showProfileOverlay();
+};
+addProfileBtn.onclick = () => {
+    const count = Object.keys(profilesData.profiles).length;
+    if (count >= 3) return;
+    const p = createNewProfile();
+    profilesData.profiles[p.id] = p;
+    setActiveProfile(p.id);
+    renderProfileList();
+};
+profileCloseBtn.onclick = () => {
+    hideProfileOverlay();
+};
+profileOverlay.addEventListener("click", (e) => {
+    if (e.target === profileOverlay) hideProfileOverlay();
+});
+
+/* ACHIEVEMENTS BUTTONS */
+achievementsBtn.onclick = () => {
+    renderAchievements();
+    achievementsOverlay.style.display = "flex";
+};
+achCloseBtn.onclick = () => {
+    achievementsOverlay.style.display = "none";
+};
+achievementsOverlay.addEventListener("click", (e) => {
+    if (e.target === achievementsOverlay) achievementsOverlay.style.display = "none";
+});
+
+/* INIT */
+loadProfiles();
+
+/* If more than one profile exists, show selector on startup */
+if (Object.keys(profilesData.profiles).length > 1) {
+    showProfileOverlay();
+}
+</script>
+</body>
+</html>
