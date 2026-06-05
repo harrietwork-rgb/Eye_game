@@ -1,0 +1,81 @@
+/* explosion.css
+   Styles for simultaneous explode effect and correct-glimpse highlight
+*/
+
+.color-board {
+  display: grid;
+  grid-template-columns: repeat(5, 64px);
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.color-block {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  cursor: pointer;
+  will-change: transform, opacity, box-shadow;
+  transition: transform 600ms cubic-bezier(.2,.9,.2,1), opacity 600ms ease-out, box-shadow 220ms ease-out;
+  backface-visibility: hidden;
+  display: inline-block;
+  position: relative;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+/* simultaneous explode state */
+.color-block.explode {
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(var(--tx,0px), var(--ty,0px)) scale(1.6) rotate(var(--rot,0deg));
+}
+
+/* small pop state (optional) */
+.color-block.pop {
+  transform: scale(1.08);
+  transition: transform 120ms ease-out;
+}
+
+/* highlight for correct cube when user picks wrong */
+.color-block.correct-glimpse {
+  box-shadow: 0 0 0 6px rgba(255,255,255,0.95), 0 12px 30px rgba(0,0,0,0.28);
+  transform: scale(1.06);
+  transition: box-shadow 160ms ease-out, transform 160ms ease-out;
+}
+
+/* stats overlay */
+.stats-overlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.45);
+  z-index: 999;
+}
+.stats-panel {
+  background: #fff;
+  padding: 20px 28px;
+  border-radius: 10px;
+  min-width: 280px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+}
+
+/* simple controls */
+.controls {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+/* reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .color-block, .color-block.explode, .color-block.pop, .color-block.correct-glimpse {
+    transition: none;
+    transform: none;
+    opacity: 0;
+  }
+}
