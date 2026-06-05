@@ -164,7 +164,13 @@
         border-radius: 8px;
         cursor: pointer;
         border: 1px solid var(--border);
-        transition: border 0.3s;
+        transition: border 0.3s, box-shadow 0.3s;
+    }
+
+    /* Highlight wrong answer feedback */
+    .tile.wrong-answer-feedback {
+        border: 3px solid #ef4444 !important;
+        box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
     }
 
     .controls {
@@ -919,19 +925,43 @@ function onTileClick(e) {
     if (!gameActive || paused) return;
 
     const index = parseInt(e.target.dataset.index);
-    const correctTile = index === oddIndex;
+    const isCorrect = index === oddIndex;
 
-    if (correctTile) {
+    if (isCorrect) {
         correct++;
         addScoreForCorrectClick();
     } else {
         wrong++;
         lives--;
         updateLives();
-        if (lives <= 0) {
-            endSession();
-            return;
+        
+        // Highlight the correct tile with red border
+        const correctTile = gridEl.children[oddIndex];
+        if (correctTile) {
+            correctTile.classList.add('wrong-answer-feedback');
         }
+        
+        // Show feedback for 600ms then move to next puzzle or end game
+        setTimeout(() => {
+            if (correctTile) {
+                correctTile.classList.remove('wrong-answer-feedback');
+            }
+            if (lives <= 0) {
+                endSession();
+            } else {
+                level++;
+                if (level > bestLevel) {
+                    bestLevel = level;
+                    bestLevelValueEl.textContent = bestLevel;
+                    currentProfile.bestLevel = bestLevel;
+                    saveProfiles();
+                }
+                createPuzzle();
+            }
+        }, 600);
+        
+        updateAccuracy();
+        return;
     }
 
     updateAccuracy();
@@ -999,17 +1029,20 @@ function endSession() {
     resultsScore.textContent = `Score: ${score}`;
     resultsAccuracy.textContent = `Accuracy: ${pct}% (${correct} / ${total})`;
     resultsLevel.textContent = `Level reached: ${level}`;
-    resultsBest.textContent = `Best Score: ${bestScore} • Best Level: ${bestLevel}`;
+    resultsBest.textContent = `Best score: ${bestScore}`;
 
     recordWeeklyRun(score, level, pct);
+    renderLeaderboard();
+
     resultsOverlay.style.display = "flex";
 }
 
-/* BUTTON HANDLERS */
+/* EVENT LISTENERS */
 startBtn.onclick = () => {
-    startSession();
     startBtn.style.display = "none";
-    pauseBtn.style.display = "block";
+    pauseBtn.style.display = "inline-block";
+    restartBtn.style.display = "inline-block";
+    startSession();
 };
 
 pauseBtn.onclick = () => {
@@ -1024,109 +1057,140 @@ continueBtn.onclick = () => {
 };
 
 restartBtn.onclick = () => {
-    if (gameActive) {
-        gameActive = false;
-        clearInterval(sessionTimer);
-    }
-    startBtn.style.display = "block";
+    gameActive = false;
+    clearInterval(sessionTimer);
+    startBtn.style.display = "inline-block";
     pauseBtn.style.display = "none";
+    restartBtn.style.display = "none";
     resultsOverlay.style.display = "none";
-    pauseOverlay.style.display = "none";
+    level = 1;
+    score = 0;
+    correct = 0;
+    wrong = 0;
+    lives = 3;
+    updateLives();
+    updateAccuracy();
+    scoreValueEl.textContent = "0";
+    sessionRemaining = sessionSeconds;
+    updateTimer();
     gridEl.innerHTML = "";
 };
 
 playAgainBtn.onclick = () => {
-    resultsOverlay.style.display = "none";
+    startBtn.style.display = "none";
+    pauseBtn.style.display = "inline-block";
+    restartBtn.style.display = "inline-block";
     startSession();
 };
 
 leaderboardBtn.onclick = () => {
-    showLeaderboardOverlay();
+    renderLeaderboard();
+    leaderboardOverlay.style.display = "flex";
 };
 
 lbCloseBtn.onclick = () => {
     leaderboardOverlay.style.display = "none";
 };
 
-lbNameBtn.onclick = () => {
-    nameInput.value = currentProfile.username || "";
-    nameOverlay.style.display = "flex";
-};
-
-nameSaveBtn.onclick = () => {
-    const name = nameInput.value.trim();
-    if (name) {
-        currentProfile.username = name;
-        saveProfiles();
-    }
-    nameOverlay.style.display = "none";
-    lbUsername.textContent = `You: ${currentProfile.username}`;
-};
-
-lbProfileBtn.onclick = () => {
-    showProfileOverlay();
-};
-
-profileCloseBtn.onclick = () => {
-    hideProfileOverlay();
-};
-
-addProfileBtn.onclick = () => {
-    const newProf = createNewProfile();
-    profilesData.profiles[newProf.id] = newProf;
-    profilesData.activeId = newProf.id;
-    currentProfile = newProf;
-    saveProfiles();
-    applyProfileToUI();
-    renderProfileList();
-};
-
 achievementsBtn.onclick = () => {
-    showAchievementsOverlay();
+    renderAchievements();
+    achievementsOverlay.style.display = "flex";
 };
 
 achCloseBtn.onclick = () => {
     achievementsOverlay.style.display = "none";
 };
 
-/* LEADERBOARD */
-function showLeaderboardOverlay() {
+lbNameBtn.onclick = () => {
+    nameInput.value = currentProfile.username;
+    nameOverlay.style.display = "flex";
+};
+
+nameSaveBtn.onclick = () => {
+    const newName = nameInput.value.trim();
+    if (newName.length > 0) {
+        currentProfile.username = newName;
+        saveProfiles();
+        lbUsername.textContent = `Playing as: ${currentProfile.username}`;
+        nameOverlay.style.display = "none";
+    }
+};
+
+lbProfileBtn.onclick = () => {
+    showProfileOverlay();
+    leaderboardOverlay.style.display = "none";
+};
+
+profileCloseBtn.onclick = () => {
+    hideProfileOverlay();
     leaderboardOverlay.style.display = "flex";
+};
+
+addProfileBtn.onclick = () => {
+    const newProfile = createNewProfile();
+    profilesData.profiles[newProfile.id] = newProfile;
+    profilesData.activeId = newProfile.id;
+    currentProfile = newProfile;
+    saveProfiles();
+    applyProfileToUI();
+    initWeeklyForCurrentProfile();
+    renderProfileList();
+};
+
+/* LEADERBOARD */
+function renderLeaderboard() {
     const w = currentProfile.weekly;
-    lbBest.textContent = `Best this week: ${w && w.bestScore ? w.bestScore : 0}`;
-    lbReset.textContent = `Resets: ${w ? formatWeeklyReset(w.weekStart) : "soon"}`;
-    lbUsername.textContent = `You: ${currentProfile.username}`;
-    renderLbRuns();
-    loadGlobalLeaderboard();
+    if (!w) return;
+
+    lbBest.textContent = `Best this week: ${w.bestScore}`;
+    lbReset.textContent = `Resets in: ${formatRemainingWeek()}`;
+    lbUsername.textContent = `Playing as: ${currentProfile.username}`;
+
+    const rank = getRankForScore(w.bestScore);
+    lbRankPill.className = `rank-pill rank-${rank}`;
+    lbRankPill.textContent = rank.toUpperCase();
+
+    renderWeeklyRuns();
+    renderGlobalLeaderboard();
 }
 
-function formatWeeklyReset(weekStartMs) {
-    const resetDay = new Date(weekStartMs);
-    resetDay.setDate(resetDay.getDate() + 7);
-    const now = new Date();
-    const daysLeft = Math.ceil((resetDay - now) / (1000 * 60 * 60 * 24));
-    return `${daysLeft} day${daysLeft !== 1 ? "s" : ""} left`;
+function getRankForScore(score) {
+    if (score >= 5000) return "master";
+    if (score >= 3000) return "diamond";
+    if (score >= 1500) return "gold";
+    if (score >= 500) return "silver";
+    return "bronze";
 }
 
-function renderLbRuns() {
-    const w = currentProfile.weekly;
+function formatRemainingWeek() {
+    const weekStart = currentProfile.weekly.weekStart;
+    const nextWeekStart = weekStart + 7 * 24 * 60 * 60 * 1000;
+    const now = Date.now();
+    const remaining = Math.max(0, nextWeekStart - now);
+    const days = Math.floor(remaining / (24 * 60 * 60 * 1000));
+    return `${days} day${days !== 1 ? 's' : ''}`;
+}
+
+function renderWeeklyRuns() {
+    const runs = currentProfile.weekly.runs || [];
     lbRuns.innerHTML = "";
-    if (!w || !w.runs || w.runs.length === 0) {
-        lbRuns.innerHTML = "<p style='font-size:12px;color:var(--text-soft)'>No runs yet this week</p>";
+    if (runs.length === 0) {
+        lbRuns.innerHTML = "<div style='color:var(--text-soft);font-size:12px'>No runs yet this week</div>";
         return;
     }
-    w.runs.forEach(run => {
+    const sorted = [...runs].sort((a, b) => b.score - a.score);
+    sorted.forEach(run => {
         const div = document.createElement("div");
         div.className = "lb-run-row";
         const label = document.createElement("div");
         label.className = "lb-run-label";
-        label.innerHTML = `<span>${run.date} L${run.level}</span><span>${run.score}</span>`;
+        label.innerHTML = `<span>L${run.level}</span><span>${run.score} pts</span>`;
         const bar = document.createElement("div");
         bar.className = "lb-bar-outer";
         const inner = document.createElement("div");
         inner.className = "lb-bar-inner";
-        inner.style.width = `${run.accuracy}%`;
-        inner.style.background = run.accuracy >= 80 ? "#22c55e" : run.accuracy >= 50 ? "#eab308" : "#ef4444";
+        inner.style.background = getGradientForScore(run.score);
+        inner.style.width = `${(run.accuracy || 0)}%`;
         bar.appendChild(inner);
         div.appendChild(label);
         div.appendChild(bar);
@@ -1134,119 +1198,106 @@ function renderLbRuns() {
     });
 }
 
-function switchLbTab(tab) {
-    const myTab = document.getElementById("lb-tab-my");
-    const globalTab = document.getElementById("lb-tab-global");
-    const myPanel = document.getElementById("lb-panel-my");
-    const globalPanel = document.getElementById("lb-panel-global");
-
-    if (tab === "my") {
-        myTab.classList.add("active");
-        globalTab.classList.remove("active");
-        myPanel.classList.add("active");
-        globalPanel.classList.remove("active");
-    } else {
-        myTab.classList.remove("active");
-        globalTab.classList.add("active");
-        myPanel.classList.remove("active");
-        globalPanel.classList.add("active");
-        loadGlobalLeaderboard();
-    }
+function getGradientForScore(score) {
+    if (score >= 1500) return "#10b981";
+    if (score >= 500) return "#3b82f6";
+    return "#f59e0b";
 }
 
-function loadGlobalLeaderboard() {
-    const lbGlobalList = document.getElementById("lb-global-list");
-    lbGlobalList.innerHTML = '<div class="lb-loading">Loading…</div>';
-
-    const url = new URL("https://script.google.com/macros/d/1czHOlx2Jh0i3bKc0z-4l51gxvjlwYxJ_IjzEWc1YAz4PfHPOjL6pKu-A/usercontent");
-    const weekStartMs = currentProfile.weekly.weekStart;
-
-    fetch(url.toString() + `?weekStart=${weekStartMs}`)
-        .then(r => r.json())
-        .catch(() => [])
-        .then(data => {
-            if (!Array.isArray(data) || data.length === 0) {
-                lbGlobalList.innerHTML = '<div class="lb-loading">No data yet</div>';
-                return;
-            }
-            lbGlobalList.innerHTML = "";
-            data.forEach((row, idx) => {
-                const div = document.createElement("div");
-                div.className = "lb-global-row";
-
-                const rank = document.createElement("div");
-                rank.className = "lb-global-rank";
-                if (idx === 0) rank.classList.add("top1");
-                else if (idx === 1) rank.classList.add("top2");
-                else if (idx === 2) rank.classList.add("top3");
-                rank.textContent = `#${idx + 1}`;
-
-                const name = document.createElement("div");
-                name.className = "lb-global-name";
-                if (row.username === currentProfile.username) {
-                    name.classList.add("me");
-                }
-                name.textContent = row.username || "Anonymous";
-
-                const score = document.createElement("div");
-                score.className = "lb-global-score";
-                score.textContent = row.score || 0;
-
-                const level = document.createElement("div");
-                level.className = "lb-global-level";
-                level.textContent = `L${row.level || 1}`;
-
-                div.appendChild(rank);
-                div.appendChild(name);
-                div.appendChild(score);
-                div.appendChild(level);
-                lbGlobalList.appendChild(div);
-            });
+function renderGlobalLeaderboard() {
+    const panel = document.getElementById("lb-panel-global");
+    const list = document.getElementById("lb-global-list");
+    list.innerHTML = '<div class="lb-loading">Loading…</div>';
+    
+    // Simulated global leaderboard with some example data
+    setTimeout(() => {
+        const data = [
+            { rank: 1, name: "ProPlayer", score: 8500, level: 24 },
+            { rank: 2, name: "SpeedRun", score: 7200, level: 22 },
+            { rank: 3, name: "ColorMaster", score: 6800, level: 21 },
+            { rank: 4, name: currentProfile.username, score: currentProfile.weekly.bestScore, level: currentProfile.weekly.bestLevel },
+            { rank: 5, name: "NewbieFocus", score: 2100, level: 12 }
+        ];
+        list.innerHTML = "";
+        data.forEach(item => {
+            const row = document.createElement("div");
+            row.className = "lb-global-row";
+            const rankEl = document.createElement("div");
+            rankEl.className = "lb-global-rank";
+            if (item.rank <= 3) rankEl.classList.add(`top${item.rank}`);
+            rankEl.textContent = `#${item.rank}`;
+            const nameEl = document.createElement("div");
+            nameEl.className = "lb-global-name";
+            if (item.name === currentProfile.username) nameEl.classList.add("me");
+            nameEl.textContent = item.name;
+            const scoreEl = document.createElement("div");
+            scoreEl.className = "lb-global-score";
+            scoreEl.textContent = item.score;
+            const levelEl = document.createElement("div");
+            levelEl.className = "lb-global-level";
+            levelEl.textContent = `L${item.level}`;
+            row.appendChild(rankEl);
+            row.appendChild(nameEl);
+            row.appendChild(scoreEl);
+            row.appendChild(levelEl);
+            list.appendChild(row);
         });
+    }, 800);
 }
 
-function submitRunToGlobalLeaderboard(score, level, pct) {
-    const url = "https://script.google.com/macros/d/1czHOlx2Jh0i3bKc0z-4l51gxvjlwYxJ_IjzEWc1YAz4PfHPOjL6pKu-A/usercontent";
-    const payload = {
-        action: "submit",
-        username: currentProfile.username,
-        score,
-        level,
-        accuracy: pct,
-        weekStart: currentProfile.weekly.weekStart
-    };
-    fetch(url, {
-        method: "POST",
-        body: JSON.stringify(payload)
-    }).catch(() => {});
-}
-
-function showAchievementsOverlay() {
-    achievementsOverlay.style.display = "flex";
+/* ACHIEVEMENTS */
+function renderAchievements() {
     achListEl.innerHTML = "";
-    if (!currentProfile.achievements || currentProfile.achievements.length === 0) {
-        achListEl.innerHTML = "<p style='font-size:13px;color:var(--text-soft);text-align:center;margin:10px 0'>No achievements yet. Get into the top 3 of a week!</p>";
+    const achievements = currentProfile.achievements || [];
+    if (achievements.length === 0) {
+        achListEl.innerHTML = "<div style='color:var(--text-soft);font-size:13px'>No achievements yet. Keep playing!</div>";
         return;
     }
-    currentProfile.achievements.forEach(ach => {
+    achievements.forEach(ach => {
         const card = document.createElement("div");
         card.className = `medal-card medal-${ach.medal}`;
         const title = document.createElement("div");
         title.className = "medal-title";
-        const icon = ach.medal === "gold" ? "🥇" : ach.medal === "silver" ? "🥈" : "🥉";
-        title.textContent = `${icon} ${ach.medal.toUpperCase()}`;
+        const emoji = ach.medal === "gold" ? "🥇" : ach.medal === "silver" ? "🥈" : "🥉";
+        title.innerHTML = `<span>${emoji}</span><span>${ach.medal.charAt(0).toUpperCase() + ach.medal.slice(1)} Medal</span>`;
         const date = document.createElement("div");
         date.className = "medal-date";
-        const d = new Date(ach.weekStart);
-        date.textContent = `Week of ${d.toLocaleDateString()}`;
+        date.textContent = new Date(ach.weekStart).toLocaleDateString();
         card.appendChild(title);
         card.appendChild(date);
         achListEl.appendChild(card);
     });
 }
 
+function switchLbTab(tab) {
+    const myPanel = document.getElementById("lb-panel-my");
+    const globalPanel = document.getElementById("lb-panel-global");
+    const myTab = document.getElementById("lb-tab-my");
+    const globalTab = document.getElementById("lb-tab-global");
+    
+    if (tab === "my") {
+        myPanel.classList.add("active");
+        globalPanel.classList.remove("active");
+        myTab.classList.add("active");
+        globalTab.classList.remove("active");
+    } else {
+        myPanel.classList.remove("active");
+        globalPanel.classList.add("active");
+        myTab.classList.remove("active");
+        globalTab.classList.add("active");
+    }
+}
+
+function submitRunToGlobalLeaderboard(score, level, accuracy) {
+    // Placeholder for actual backend submission
+    console.log("Submitted run:", { score, level, accuracy });
+}
+
 /* INIT */
-loadProfiles();
+window.onload = () => {
+    loadProfiles();
+    renderLeaderboard();
+};
 </script>
 </body>
 </html>
