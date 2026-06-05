@@ -1242,6 +1242,18 @@ pauseBtn.onclick = pauseGame;
 continueBtn.onclick = continueGame;
 playAgainBtn.onclick = startSession;
 
+resultsLeaderboardBtn.onclick = () => {
+  resultsOverlay.style.display = "none";
+  renderLeaderboard();
+  leaderboardOverlay.style.display = "flex";
+};
+
+resultsAchievementsBtn.onclick = () => {
+  resultsOverlay.style.display = "none";
+  renderAchievements();
+  achievementsOverlay.style.display = "flex";
+};
+
 leaderboardBtn.onclick = () => {
   renderLeaderboard();
   leaderboardOverlay.style.display = "flex";
