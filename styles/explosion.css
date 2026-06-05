@@ -1,7 +1,67 @@
 /* explosion.css
-   Styles for simultaneous explode effect and correct-glimpse highlight
+   Styles for tile explosion, wrong-answer feedback, and correct-answer glimpse
 */
 
+/* Game tile styles - matching .tile from index.html */
+.tile {
+  will-change: transform, opacity, box-shadow, border;
+  transition:
+    border 0.3s,
+    box-shadow 0.3s,
+    transform 600ms cubic-bezier(.2, .9, .2, 1),
+    opacity 600ms ease-out;
+  backface-visibility: hidden;
+  position: relative;
+}
+
+/* Explosion effect for game tiles */
+.tile.explode {
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(var(--tx, 0px), var(--ty, 0px)) scale(1.6) rotate(var(--rot, 0deg));
+}
+
+/* Small pop before explosion */
+.tile.pop {
+  transform: scale(1.08);
+  transition: transform 120ms ease-out;
+}
+
+/* Green highlight for the correct tile when the user picks wrong */
+.tile.correct-glimpse {
+  border: 3px solid #22c55e !important;
+  box-shadow:
+    0 0 0 6px rgba(34, 197, 94, 0.35),
+    0 8px 20px rgba(34, 197, 94, 0.45);
+  transform: scale(1.06);
+  transition:
+    border 160ms ease-out,
+    box-shadow 160ms ease-out,
+    transform 160ms ease-out;
+}
+
+/* Red highlight for the tile the user clicked incorrectly */
+.tile.wrong-answer-feedback {
+  border: 3px solid #ef4444 !important;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+  animation: wrong-pulse 0.45s ease-out;
+}
+
+@keyframes wrong-pulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.03);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Optional legacy styles if you still use .color-block anywhere */
 .color-board {
   display: grid;
   grid-template-columns: repeat(5, 64px);
@@ -17,113 +77,53 @@
   border-radius: 8px;
   cursor: pointer;
   will-change: transform, opacity, box-shadow;
-  transition: transform 600ms cubic-bezier(.2,.9,.2,1), opacity 600ms ease-out, box-shadow 220ms ease-out;
+  transition:
+    transform 600ms cubic-bezier(.2, .9, .2, 1),
+    opacity 600ms ease-out,
+    box-shadow 220ms ease-out;
   backface-visibility: hidden;
   display: inline-block;
   position: relative;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 }
 
-/* simultaneous explode state */
 .color-block.explode {
   pointer-events: none;
   opacity: 0;
-  transform: translate(var(--tx,0px), var(--ty,0px)) scale(1.6) rotate(var(--rot,0deg));
+  transform: translate(var(--tx, 0px), var(--ty, 0px)) scale(1.6) rotate(var(--rot, 0deg));
 }
 
-/* small pop state (optional) */
 .color-block.pop {
   transform: scale(1.08);
   transition: transform 120ms ease-out;
 }
 
-/* highlight for correct cube when user picks wrong */
 .color-block.correct-glimpse {
-  box-shadow: 0 0 0 6px rgba(255,255,255,0.95), 0 12px 30px rgba(0,0,0,0.28);
+  box-shadow:
+    0 0 0 6px rgba(34, 197, 94, 0.35),
+    0 8px 20px rgba(34, 197, 94, 0.45);
   transform: scale(1.06);
-  transition: box-shadow 160ms ease-out, transform 160ms ease-out;
+  transition:
+    box-shadow 160ms ease-out,
+    transform 160ms ease-out;
 }
 
-/* Game tile styles - matching .tile from index.html */
-.tile {
-  will-change: transform, opacity, box-shadow, border;
-  transition: border 0.3s, box-shadow 0.3s, transform 600ms cubic-bezier(.2,.9,.2,1), opacity 600ms ease-out;
-  backface-visibility: hidden;
-  position: relative;
-}
-
-/* Explosion effect for tiles */
-.tile.explode {
-  pointer-events: none;
-  opacity: 0;
-  transform: translate(var(--tx,0px), var(--ty,0px)) scale(1.6) rotate(var(--rot,0deg));
-}
-
-/* Tile pop effect */
-.tile.pop {
-  transform: scale(1.08);
-  transition: transform 120ms ease-out;
-}
-
-/* Correct tile highlight when user picks wrong */
-.tile.correct-glimpse {
-  box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.6), 0 8px 20px rgba(34, 197, 94, 0.4);
-  transform: scale(1.05);
-  transition: box-shadow 160ms ease-out, transform 160ms ease-out;
-}
-
-/* Wrong answer feedback - red highlight */
-.tile.wrong-answer-feedback {
-  border: 3px solid #ef4444 !important;
-  box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
-  animation: wrong-pulse 0.6s ease-out;
-}
-
-@keyframes wrong-pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.02);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-/* stats overlay */
-.stats-overlay {
-  position: fixed;
-  inset: 0;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0,0,0,0.45);
-  z-index: 999;
-}
-.stats-panel {
-  background: #fff;
-  padding: 20px 28px;
-  border-radius: 10px;
-  min-width: 280px;
-  text-align: center;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-}
-
-/* simple controls */
-.controls {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  margin-top: 12px;
-}
-
-/* reduced motion preference */
+/* Reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
-  .tile, .tile.explode, .tile.pop, .tile.correct-glimpse,
-  .color-block, .color-block.explode, .color-block.pop, .color-block.correct-glimpse {
+  .tile.explode,
+  .tile.pop,
+  .tile.correct-glimpse,
+  .tile.wrong-answer-feedback,
+  .color-block.explode,
+  .color-block.pop,
+  .color-block.correct-glimpse {
     transition: none;
     transform: none;
+    animation: none;
+  }
+
+  .tile.explode,
+  .color-block.explode {
     opacity: 0;
   }
 }
