@@ -7,12 +7,6 @@
   function gtag(){dataLayer.push(arguments);}
   gtag("js", new Date());
   gtag("config", "G-NFRD369Q9E", { send_page_view: true });
-
-  window.GA_DEBUG = true;
-  if (window.GA_DEBUG) {
-    gtag("set", { debug_mode: true });
-    console.info("[GA] Debug mode enabled");
-  }
 </script>
 
 <meta charset="UTF-8">
@@ -22,523 +16,517 @@
 <link rel="stylesheet" href="styles/explosion.css">
 
 <style>
-    :root {
-        --accent: #2563eb;
-        --accent-soft: #dbeafe;
-        --text-main: #111827;
-        --text-soft: #4b5563;
-        --bg: #ffffff;
-        --box-bg: #f9fafb;
-        --border: #e5e7eb;
-    }
+:root {
+  --accent: #2563eb;
+  --accent-soft: #dbeafe;
+  --text-main: #111827;
+  --text-soft: #4b5563;
+  --bg: #ffffff;
+  --box-bg: #f9fafb;
+  --border: #e5e7eb;
+}
 
-    body.dark {
-        --accent: #60a5fa;
-        --accent-soft: #1e3a8a;
-        --text-main: #f3f4f6;
-        --text-soft: #cbd5e1;
-        --bg: #0f172a;
-        --box-bg: #1e293b;
-        --border: #334155;
-    }
+body.dark {
+  --accent: #60a5fa;
+  --accent-soft: #1e3a8a;
+  --text-main: #f3f4f6;
+  --text-soft: #cbd5e1;
+  --bg: #0f172a;
+  --box-bg: #1e293b;
+  --border: #334155;
+}
 
-    body {
-        margin: 0;
-        background: var(--bg);
-        font-family: system-ui, sans-serif;
-        color: var(--text-main);
-        display: flex;
-        justify-content: center;
-        padding: 20px;
-        transition: background 0.3s, color 0.3s;
-    }
+body {
+  margin: 0;
+  background: var(--bg);
+  font-family: system-ui, sans-serif;
+  color: var(--text-main);
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  transition: background 0.3s, color 0.3s;
+}
 
-    .app {
-        width: 100%;
-        max-width: 420px;
-        background: var(--bg);
-        padding: 16px;
-        border-radius: 16px;
-        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
-        border: 1px solid var(--border);
-        transition: background 0.3s, border 0.3s;
-    }
+.app {
+  width: 100%;
+  max-width: 420px;
+  background: var(--bg);
+  padding: 16px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+  border: 1px solid var(--border);
+  transition: background 0.3s, border 0.3s;
+}
 
-    header {
-        padding-bottom: 10px;
-        border-bottom: 1px solid var(--border);
-        margin-bottom: 10px;
-        position: relative;
-    }
+header {
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 10px;
+  position: relative;
+}
 
-    h1 {
-        font-size: 20px;
-        margin: 0 0 4px;
-    }
+h1 {
+  font-size: 20px;
+  margin: 0 0 4px;
+}
 
-    .subtitle {
-        font-size: 13px;
-        color: var(--text-soft);
-    }
+.subtitle {
+  font-size: 13px;
+  color: var(--text-soft);
+}
 
-    #theme-toggle {
-        position: absolute;
-        right: 0;
-        top: 0;
-        padding: 6px 10px;
-        border-radius: 999px;
-        background: var(--box-bg);
-        border: 1px solid var(--border);
-        cursor: pointer;
-        font-size: 16px;
-        transition: background 0.3s, color 0.3s;
-    }
+#theme-toggle {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
 
-    .top-row {
-        display: flex;
-        justify-content: space-between;
-        margin: 12px 0;
-    }
+.top-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 12px 0;
+}
 
-    .box {
-        background: var(--box-bg);
-        padding: 10px;
-        border-radius: 12px;
-        width: 48%;
-        text-align: center;
-        border: 1px solid var(--border);
-        transition: background 0.3s, border 0.3s;
-        box-sizing: border-box;
-    }
+.box {
+  background: var(--box-bg);
+  padding: 10px;
+  border-radius: 12px;
+  width: 48%;
+  text-align: center;
+  border: 1px solid var(--border);
+  box-sizing: border-box;
+}
 
-    .box-label {
-        font-size: 12px;
-        color: var(--text-soft);
-        margin-bottom: 4px;
-    }
+.box-label {
+  font-size: 12px;
+  color: var(--text-soft);
+  margin-bottom: 4px;
+}
 
-    #timer-value {
-        font-size: 24px;
-        font-weight: 600;
-        color: var(--accent);
-    }
+#timer-value {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--accent);
+}
 
-    #score-value,
-    #best-score-value,
-    #best-level-value {
-        font-size: 20px;
-        font-weight: 600;
-    }
+#score-value,
+#best-score-value,
+#best-level-value {
+  font-size: 20px;
+  font-weight: 600;
+}
 
-    .mid-row {
-        display: flex;
-        justify-content: space-between;
-        gap: 8px;
-        margin-bottom: 8px;
-    }
+.mid-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
 
-    .mid-box {
-        flex: 1;
-        background: var(--box-bg);
-        border-radius: 10px;
-        padding: 8px;
-        border: 1px solid var(--border);
-        text-align: center;
-        font-size: 13px;
-        transition: background 0.3s, border 0.3s;
-    }
+.mid-box {
+  flex: 1;
+  background: var(--box-bg);
+  border-radius: 10px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  text-align: center;
+  font-size: 13px;
+}
 
-    #accuracy {
-        font-size: 13px;
-        color: var(--text-soft);
-    }
+#accuracy,
+#level-label {
+  color: var(--text-soft);
+}
 
-    #lives {
-        font-size: 20px;
-    }
+#lives {
+  font-size: 20px;
+}
 
-    #level-label {
-        font-size: 14px;
-        margin: 6px 0 4px;
-        color: var(--text-soft);
-    }
+#level-label {
+  font-size: 14px;
+  margin: 6px 0 4px;
+}
 
-    .grid {
-        display: grid;
-        gap: 6px;
-        margin: 10px 0 14px;
-    }
+.grid {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 14px;
+}
 
-    .tile {
-        width: 100%;
-        padding-bottom: 100%;
-        border-radius: 8px;
-        cursor: pointer;
-        border: 1px solid var(--border);
-        box-sizing: border-box;
-    }
+.tile {
+  width: 100%;
+  padding-bottom: 100%;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  box-sizing: border-box;
+}
 
-    .controls {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 10px;
-        gap: 6px;
-        flex-wrap: wrap;
-    }
+.controls {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  gap: 6px;
+  flex-wrap: wrap;
+}
 
-    button {
-        padding: 8px 12px;
-        border-radius: 999px;
-        border: none;
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 13px;
-        white-space: nowrap;
-    }
+button {
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  white-space: nowrap;
+}
 
-    .primary {
-        background: var(--accent);
-        color: #ffffff;
-    }
+.primary {
+  background: var(--accent);
+  color: #ffffff;
+}
 
-    .ghost {
-        background: var(--box-bg);
-        color: var(--text-main);
-        border: 1px solid var(--border);
-    }
+.ghost {
+  background: var(--box-bg);
+  color: var(--text-main);
+  border: 1px solid var(--border);
+}
 
-    #pause-overlay,
-    #results-overlay,
-    #leaderboard-overlay,
-    #name-overlay,
-    #profile-overlay,
-    #achievements-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(15, 23, 42, 0.12);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-        z-index: 50;
-    }
+#pause-overlay,
+#results-overlay,
+#leaderboard-overlay,
+#name-overlay,
+#profile-overlay,
+#achievements-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.12);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 50;
+}
 
-    .overlay-card {
-        background: var(--box-bg);
-        border-radius: 16px;
-        padding: 18px 16px;
-        max-width: 360px;
-        width: 100%;
-        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
-        border: 1px solid var(--border);
-        text-align: center;
-        transition: background 0.3s, border 0.3s;
-    }
+.overlay-card {
+  background: var(--box-bg);
+  border-radius: 16px;
+  padding: 18px 16px;
+  max-width: 360px;
+  width: 100%;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+  border: 1px solid var(--border);
+  text-align: center;
+}
 
-    .overlay-card h2 {
-        margin: 0 0 6px;
-        font-size: 18px;
-    }
+.overlay-card h2 {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
 
-    .overlay-card p {
-        margin: 4px 0;
-        font-size: 13px;
-        color: var(--text-soft);
-    }
+.overlay-card p {
+  margin: 4px 0;
+  font-size: 13px;
+  color: var(--text-soft);
+}
 
-    .overlay-card button {
-        margin-top: 10px;
-    }
+.overlay-card button {
+  margin-top: 10px;
+}
 
-    .rank-pill {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 600;
-        margin-bottom: 6px;
-        color: #111827;
-    }
+.rank-pill {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #111827;
+}
 
-    .rank-bronze { background: #d97757; color: #111827; }
-    .rank-silver { background: #e5e7eb; color: #111827; }
-    .rank-gold { background: #facc15; color: #111827; }
-    .rank-diamond { background: #bfdbfe; color: #1e3a8a; }
-    .rank-master { background: #c4b5fd; color: #4c1d95; }
+.rank-bronze { background: #d97757; color: #111827; }
+.rank-silver { background: #e5e7eb; color: #111827; }
+.rank-gold { background: #facc15; color: #111827; }
+.rank-diamond { background: #bfdbfe; color: #1e3a8a; }
+.rank-master { background: #c4b5fd; color: #4c1d95; }
 
-    .lb-meta {
-        font-size: 12px;
-        color: var(--text-soft);
-        margin-bottom: 8px;
-    }
+.lb-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 10px;
+}
 
-    .lb-tabs {
-        display: flex;
-        gap: 4px;
-        margin-bottom: 10px;
-    }
+.lb-tab {
+  flex: 1;
+  padding: 6px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--box-bg);
+  color: var(--text-main);
+}
 
-    .lb-tab {
-        flex: 1;
-        padding: 6px;
-        border-radius: 8px;
-        border: 1px solid var(--border);
-        background: var(--box-bg);
-        color: var(--text-main);
-        font-size: 12px;
-        font-weight: 600;
-        cursor: pointer;
-    }
+.lb-tab.active {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+}
 
-    .lb-tab.active {
-        background: var(--accent);
-        color: #fff;
-        border-color: var(--accent);
-    }
+.lb-panel {
+  display: none;
+}
 
-    .lb-panel {
-        display: none;
-    }
+.lb-panel.active {
+  display: block;
+}
 
-    .lb-panel.active {
-        display: block;
-    }
+.lb-meta {
+  font-size: 12px;
+  color: var(--text-soft);
+  margin-bottom: 8px;
+}
 
-    .lb-runs,
-    .lb-global-list {
-        margin-top: 8px;
-        max-height: 260px;
-        overflow-y: auto;
-        text-align: left;
-        font-size: 12px;
-    }
+.lb-runs,
+.lb-global-list {
+  margin-top: 8px;
+  max-height: 240px;
+  overflow-y: auto;
+  text-align: left;
+  font-size: 12px;
+}
 
-    .lb-loading {
-        color: var(--text-soft);
-        font-size: 12px;
-        padding: 12px 0;
-        text-align: center;
-    }
+.lb-run-row {
+  margin: 6px 0;
+}
 
-    .lb-run-row {
-        margin: 4px 0;
-    }
+.lb-run-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2px;
+  gap: 4px;
+}
 
-    .lb-run-label {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 2px;
-        gap: 4px;
-    }
+.lb-run-label span {
+  white-space: nowrap;
+}
 
-    .lb-run-label span {
-        white-space: nowrap;
-    }
+.lb-run-label span:last-child {
+  margin-left: auto;
+}
 
-    .name-input {
-        width: 100%;
-        padding: 8px 10px;
-        border-radius: 8px;
-        border: 1px solid var(--border);
-        font-size: 14px;
-        margin-top: 8px;
-        box-sizing: border-box;
-        background: var(--bg);
-        color: var(--text-main);
-    }
+.lb-bar-outer {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  overflow: hidden;
+}
 
-    .profile-list {
-        margin-top: 10px;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-    }
+.lb-bar-inner {
+  height: 100%;
+  border-radius: 999px;
+}
 
-    .profile-btn {
-        width: 100%;
-        text-align: left;
-        padding: 8px 10px;
-        border-radius: 10px;
-        border: 1px solid var(--border);
-        background: var(--box-bg);
-        cursor: pointer;
-        font-size: 14px;
-    }
+.name-input {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  font-size: 14px;
+  margin-top: 8px;
+  box-sizing: border-box;
+  background: var(--bg);
+  color: var(--text-main);
+}
 
-    .profile-btn.active {
-        border-color: var(--accent);
-        background: var(--accent-soft);
-    }
+.profile-list,
+.ach-list {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
-    .ach-list {
-        margin-top: 10px;
-        max-height: 260px;
-        overflow-y: auto;
-        text-align: left;
-        font-size: 13px;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
+.profile-btn {
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--box-bg);
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-main);
+}
 
-    .medal-card {
-        border-radius: 12px;
-        padding: 10px 12px;
-        color: #111827;
-        box-shadow: 0 4px 10px rgba(15, 23, 42, 0.15);
-    }
+.profile-btn.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
 
-    .medal-gold { background: #facc15; }
-    .medal-silver { background: #e5e7eb; }
-    .medal-bronze { background: #d97757; }
+.ach-list {
+  max-height: 260px;
+  overflow-y: auto;
+  text-align: left;
+  font-size: 13px;
+}
 
-    .medal-title {
-        font-weight: 700;
-        margin-bottom: 4px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
+.medal-card {
+  border-radius: 12px;
+  padding: 10px 12px;
+  color: #111827;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.15);
+}
 
-    .medal-date {
-        font-size: 12px;
-        opacity: 0.9;
-    }
+.medal-gold { background: #facc15; }
+.medal-silver { background: #e5e7eb; }
+.medal-bronze { background: #d97757; }
+
+.medal-title {
+  font-weight: 700;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.medal-date {
+  font-size: 12px;
+  opacity: 0.9;
+}
 </style>
 </head>
 
 <body>
 <div class="app">
-    <header>
-        <h1>Colour Focus</h1>
-        <div class="subtitle">Tap the lighter square as quickly and accurately as you can.</div>
-        <button id="theme-toggle">🌙</button>
-    </header>
+  <header>
+    <h1>Colour Focus</h1>
+    <div class="subtitle">Tap the lighter square as quickly and accurately as you can.</div>
+    <button id="theme-toggle">🌙</button>
+  </header>
 
-    <div class="top-row">
-        <div class="box">
-            <div class="box-label">Best Score</div>
-            <div id="best-score-value">0</div>
-        </div>
-        <div class="box">
-            <div class="box-label">Best Level</div>
-            <div id="best-level-value">1</div>
-        </div>
+  <div class="top-row">
+    <div class="box">
+      <div class="box-label">Best Score</div>
+      <div id="best-score-value">0</div>
     </div>
-
-    <div class="top-row">
-        <div class="box">
-            <div class="box-label">Time</div>
-            <div id="timer-value">00:60</div>
-        </div>
-        <div class="box">
-            <div class="box-label">Score</div>
-            <div id="score-value">0</div>
-        </div>
+    <div class="box">
+      <div class="box-label">Best Level</div>
+      <div id="best-level-value">1</div>
     </div>
+  </div>
 
-    <div class="mid-row">
-        <div class="mid-box">
-            <div class="box-label">Accuracy</div>
-            <div id="accuracy">0% (0 / 0)</div>
-        </div>
-        <div class="mid-box">
-            <div class="box-label">Lives</div>
-            <div id="lives">❤️❤️❤️</div>
-        </div>
+  <div class="top-row">
+    <div class="box">
+      <div class="box-label">Time</div>
+      <div id="timer-value">01:00</div>
     </div>
-
-    <div id="level-label">Level 1</div>
-    <div id="grid" class="grid"></div>
-
-    <div class="controls">
-        <button id="pause-btn" class="ghost">Pause</button>
-        <button id="restart-btn" class="ghost">Restart</button>
-        <button id="start-btn" class="primary">Play</button>
-        <button id="leaderboard-btn" class="ghost">Leaderboard</button>
-        <button id="achievements-btn" class="ghost">Achievements</button>
+    <div class="box">
+      <div class="box-label">Score</div>
+      <div id="score-value">0</div>
     </div>
+  </div>
+
+  <div class="mid-row">
+    <div class="mid-box">
+      <div class="box-label">Accuracy</div>
+      <div id="accuracy">0% (0 / 0)</div>
+    </div>
+    <div class="mid-box">
+      <div class="box-label">Lives</div>
+      <div id="lives">❤️❤️❤️</div>
+    </div>
+  </div>
+
+  <div id="level-label">Level 1</div>
+  <div id="grid" class="grid"></div>
+
+  <div class="controls">
+    <button id="pause-btn" class="ghost">Pause</button>
+    <button id="restart-btn" class="ghost">Restart</button>
+    <button id="start-btn" class="primary">Play</button>
+    <button id="leaderboard-btn" class="ghost">Leaderboard</button>
+    <button id="achievements-btn" class="ghost">Achievements</button>
+  </div>
 </div>
 
 <div id="pause-overlay">
-    <div class="overlay-card">
-        <h2>Paused</h2>
-        <p>Take a breather. Tap continue when you're ready.</p>
-        <button id="continue-btn" class="primary">Continue</button>
-    </div>
+  <div class="overlay-card">
+    <h2>Paused</h2>
+    <p>Take a breather. Tap continue when you're ready.</p>
+    <button id="continue-btn" class="primary">Continue</button>
+  </div>
 </div>
 
 <div id="results-overlay">
-    <div class="overlay-card">
-        <h2>Results</h2>
-        <p id="results-score"></p>
-        <p id="results-accuracy"></p>
-        <p id="results-level"></p>
-        <p id="results-best"></p>
-        <button id="play-again-btn" class="primary">Play Again</button>
-    </div>
+  <div class="overlay-card">
+    <h2>Results</h2>
+    <p id="results-score"></p>
+    <p id="results-accuracy"></p>
+    <p id="results-level"></p>
+    <p id="results-best"></p>
+    <button id="play-again-btn" class="primary">Play Again</button>
+  </div>
 </div>
 
 <div id="leaderboard-overlay">
-    <div class="overlay-card">
-        <h2>Leaderboard</h2>
-        <div class="lb-tabs">
-            <button class="lb-tab active" id="lb-tab-my" onclick="switchLbTab('my')">My Week</button>
-            <button class="lb-tab" id="lb-tab-global" onclick="switchLbTab('global')">Global</button>
-        </div>
+  <div class="overlay-card">
+    <h2>Leaderboard</h2>
 
-        <div id="lb-panel-my" class="lb-panel active">
-            <div id="lb-rank-pill" class="rank-pill rank-bronze">BRONZE</div>
-            <p id="lb-best"></p>
-            <p id="lb-reset"></p>
-            <p id="lb-username"></p>
-            <div class="lb-meta">Last 10 runs this week:</div>
-            <div id="lb-runs" class="lb-runs"></div>
-        </div>
-
-        <div id="lb-panel-global" class="lb-panel">
-            <p style="font-size:12px;color:var(--text-soft);margin:0 0 4px">Top players this week across all devices</p>
-            <div id="lb-global-list" class="lb-global-list">
-                <div class="lb-loading">Loading...</div>
-            </div>
-        </div>
-
-        <button id="lb-name-btn" class="ghost">Change name</button>
-        <button id="lb-profile-btn" class="ghost">Switch profile</button>
-        <button id="lb-close-btn" class="primary">Close</button>
+    <div class="lb-tabs">
+      <button class="lb-tab active" id="lb-tab-my" onclick="switchLbTab('my')">My Week</button>
+      <button class="lb-tab" id="lb-tab-global" onclick="switchLbTab('global')">Global</button>
     </div>
+
+    <div id="lb-panel-my" class="lb-panel active">
+      <div id="lb-rank-pill" class="rank-pill rank-bronze">BRONZE</div>
+      <p id="lb-best"></p>
+      <p id="lb-reset"></p>
+      <p id="lb-username"></p>
+      <div class="lb-meta">Last 10 runs this week:</div>
+      <div id="lb-runs" class="lb-runs"></div>
+    </div>
+
+    <div id="lb-panel-global" class="lb-panel">
+      <p style="font-size:12px;color:var(--text-soft);margin:0 0 4px">Top players this week across all devices</p>
+      <div id="lb-global-list" class="lb-global-list">
+        <div style="text-align:center;color:var(--text-soft);padding:12px 0;">Global leaderboard coming soon.</div>
+      </div>
+    </div>
+
+    <button id="lb-name-btn" class="ghost">Change name</button>
+    <button id="lb-profile-btn" class="ghost">Switch profile</button>
+    <button id="lb-close-btn" class="primary">Close</button>
+  </div>
 </div>
 
 <div id="name-overlay">
-    <div class="overlay-card">
-        <h2>Set Your Name</h2>
-        <p>Choose the name that appears on your leaderboard.</p>
-        <input id="name-input" class="name-input" maxlength="20">
-        <button id="name-save-btn" class="primary">Save</button>
-    </div>
+  <div class="overlay-card">
+    <h2>Set Your Name</h2>
+    <p>Choose the name that appears on your leaderboard.</p>
+    <input id="name-input" class="name-input" maxlength="20">
+    <button id="name-save-btn" class="primary">Save</button>
+  </div>
 </div>
 
 <div id="profile-overlay">
-    <div class="overlay-card">
-        <h2>Select Profile</h2>
-        <p>You can have up to 3 profiles on this device.</p>
-        <div id="profile-list" class="profile-list"></div>
-        <button id="add-profile-btn" class="ghost">Add profile</button>
-        <button id="profile-close-btn" class="primary">Close</button>
-    </div>
+  <div class="overlay-card">
+    <h2>Select Profile</h2>
+    <p>You can have up to 3 profiles on this device.</p>
+    <div id="profile-list" class="profile-list"></div>
+    <button id="add-profile-btn" class="ghost">Add profile</button>
+    <button id="profile-close-btn" class="primary">Close</button>
+  </div>
 </div>
 
 <div id="achievements-overlay">
-    <div class="overlay-card">
-        <h2>Achievements</h2>
-        <p>Your permanent weekly medals.</p>
-        <div id="ach-list" class="ach-list"></div>
-        <button id="ach-close-btn" class="primary">Close</button>
-    </div>
+  <div class="overlay-card">
+    <h2>Achievements</h2>
+    <p>Your permanent weekly medals.</p>
+    <div id="ach-list" class="ach-list"></div>
+    <button id="ach-close-btn" class="primary">Close</button>
+  </div>
 </div>
 
-<script defer src="scripts/explosion-and-feedback.js"></script>
-<script defer src="scripts/game-logic.js"></script>
+<script src="scripts/explosion-and-feedback.js"></script>
 
 <script>
 let level = 1;
@@ -546,16 +534,20 @@ let score = 0;
 let correct = 0;
 let wrong = 0;
 let lives = 3;
+
 let bestScore = 0;
 let bestLevel = 1;
+
 let sessionSeconds = 60;
 let sessionRemaining = sessionSeconds;
 let sessionTimer = null;
+
 let gameActive = false;
 let paused = false;
 let feedbackActive = false;
 let oddIndex = -1;
 let lastClickTime = null;
+
 let profilesData = null;
 let currentProfile = null;
 
@@ -567,12 +559,14 @@ const bestLevelValueEl = document.getElementById("best-level-value");
 const levelLabelEl = document.getElementById("level-label");
 const accuracyEl = document.getElementById("accuracy");
 const livesEl = document.getElementById("lives");
+
 const pauseOverlay = document.getElementById("pause-overlay");
 const resultsOverlay = document.getElementById("results-overlay");
 const leaderboardOverlay = document.getElementById("leaderboard-overlay");
 const nameOverlay = document.getElementById("name-overlay");
 const profileOverlay = document.getElementById("profile-overlay");
 const achievementsOverlay = document.getElementById("achievements-overlay");
+
 const pauseBtn = document.getElementById("pause-btn");
 const continueBtn = document.getElementById("continue-btn");
 const startBtn = document.getElementById("start-btn");
@@ -583,426 +577,757 @@ const achievementsBtn = document.getElementById("achievements-btn");
 const lbCloseBtn = document.getElementById("lb-close-btn");
 const lbNameBtn = document.getElementById("lb-name-btn");
 const lbProfileBtn = document.getElementById("lb-profile-btn");
+
 const themeToggle = document.getElementById("theme-toggle");
+
 const resultsScore = document.getElementById("results-score");
 const resultsAccuracy = document.getElementById("results-accuracy");
 const resultsLevel = document.getElementById("results-level");
 const resultsBest = document.getElementById("results-best");
+
 const lbRankPill = document.getElementById("lb-rank-pill");
 const lbBest = document.getElementById("lb-best");
 const lbReset = document.getElementById("lb-reset");
 const lbRuns = document.getElementById("lb-runs");
 const lbUsername = document.getElementById("lb-username");
+
 const nameInput = document.getElementById("name-input");
 const nameSaveBtn = document.getElementById("name-save-btn");
+
 const profileListEl = document.getElementById("profile-list");
 const addProfileBtn = document.getElementById("add-profile-btn");
 const profileCloseBtn = document.getElementById("profile-close-btn");
+
 const achListEl = document.getElementById("ach-list");
 const achCloseBtn = document.getElementById("ach-close-btn");
 
 if (localStorage.getItem("colourFocusTheme") === "dark") {
-    document.body.classList.add("dark");
-    themeToggle.textContent = "☀️";
+  document.body.classList.add("dark");
+  themeToggle.textContent = "☀️";
 }
 
 themeToggle.onclick = () => {
-    document.body.classList.toggle("dark");
-    if (document.body.classList.contains("dark")) {
-        themeToggle.textContent = "☀️";
-        localStorage.setItem("colourFocusTheme", "dark");
-    } else {
-        themeToggle.textContent = "🌙";
-        localStorage.setItem("colourFocusTheme", "light");
-    }
+  document.body.classList.toggle("dark");
+  const isDark = document.body.classList.contains("dark");
+  themeToggle.textContent = isDark ? "☀️" : "🌙";
+  localStorage.setItem("colourFocusTheme", isDark ? "dark" : "light");
 };
 
 function createRandomUsername() {
-    return `CF-${Math.floor(1000 + Math.random() * 9000)}`;
-}
-
-function createNewProfile() {
-    const id = "p" + Date.now() + Math.floor(Math.random() * 1000);
-    return {
-        id,
-        username: createRandomUsername(),
-        bestScore: 0,
-        bestLevel: 1,
-        weekly: {
-            weekStart: Date.now(),
-            bestScore: 0,
-            bestLevel: 1,
-            runs: []
-        },
-        achievements: []
-    };
-}
-
-function loadProfiles() {
-    const raw = localStorage.getItem("colourFocusProfiles");
-    if (raw) {
-        try {
-            profilesData = JSON.parse(raw);
-        } catch {
-            profilesData = null;
-        }
-    }
-
-    if (!profilesData || !profilesData.profiles || Object.keys(profilesData.profiles).length === 0) {
-        const profile = createNewProfile();
-        profilesData = {
-            activeId: profile.id,
-            profiles: {
-                [profile.id]: profile
-            }
-        };
-    }
-
-    if (!profilesData.activeId || !profilesData.profiles[profilesData.activeId]) {
-        profilesData.activeId = Object.keys(profilesData.profiles)[0];
-    }
-
-    currentProfile = profilesData.profiles[profilesData.activeId];
-    saveProfiles();
-    applyProfileToUI();
-    initWeeklyForCurrentProfile();
-}
-
-function saveProfiles() {
-    localStorage.setItem("colourFocusProfiles", JSON.stringify(profilesData));
-}
-
-function setActiveProfile(id) {
-    if (!profilesData.profiles[id]) return;
-    profilesData.activeId = id;
-    currentProfile = profilesData.profiles[id];
-    saveProfiles();
-    applyProfileToUI();
-    initWeeklyForCurrentProfile();
-}
-
-function applyProfileToUI() {
-    bestScore = currentProfile.bestScore || 0;
-    bestLevel = currentProfile.bestLevel || 1;
-    bestScoreValueEl.textContent = bestScore;
-    bestLevelValueEl.textContent = bestLevel;
-}
-
-function renderProfileList() {
-    profileListEl.innerHTML = "";
-    const ids = Object.keys(profilesData.profiles);
-
-    ids.forEach(id => {
-        const p = profilesData.profiles[id];
-        const btn = document.createElement("button");
-        btn.className = "profile-btn";
-        if (id === profilesData.activeId) btn.classList.add("active");
-        btn.textContent = p.username;
-        btn.onclick = () => {
-            setActiveProfile(id);
-            renderProfileList();
-        };
-        profileListEl.appendChild(btn);
-    });
-
-    addProfileBtn.style.display = ids.length >= 3 ? "none" : "block";
-}
-
-function showProfileOverlay() {
-    renderProfileList();
-    profileOverlay.style.display = "flex";
-}
-
-function hideProfileOverlay() {
-    profileOverlay.style.display = "none";
+  return `CF-${Math.floor(1000 + Math.random() * 9000)}`;
 }
 
 function getCurrentWeekStartMs() {
-    const now = new Date();
-    const day = now.getUTCDay();
-    const diff = day === 0 ? -6 : 1 - day;
-    const monday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + diff));
-    return monday.getTime();
+  const now = new Date();
+  const day = now.getUTCDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  const monday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + diff));
+  return monday.getTime();
+}
+
+function createNewProfile() {
+  const id = "p" + Date.now() + Math.floor(Math.random() * 1000);
+  const weekStart = getCurrentWeekStartMs();
+
+  return {
+    id,
+    username: createRandomUsername(),
+    bestScore: 0,
+    bestLevel: 1,
+    weekly: {
+      weekStart,
+      bestScore: 0,
+      bestLevel: 1,
+      runs: []
+    },
+    achievements: []
+  };
+}
+
+function loadProfiles() {
+  const raw = localStorage.getItem("colourFocusProfiles");
+
+  if (raw) {
+    try {
+      profilesData = JSON.parse(raw);
+    } catch {
+      profilesData = null;
+    }
+  }
+
+  if (!profilesData || !profilesData.profiles || Object.keys(profilesData.profiles).length === 0) {
+    const profile = createNewProfile();
+    profilesData = {
+      activeId: profile.id,
+      profiles: {
+        [profile.id]: profile
+      }
+    };
+  }
+
+  if (!profilesData.activeId || !profilesData.profiles[profilesData.activeId]) {
+    profilesData.activeId = Object.keys(profilesData.profiles)[0];
+  }
+
+  currentProfile = profilesData.profiles[profilesData.activeId];
+
+  saveProfiles();
+  applyProfileToUI();
+  initWeeklyForCurrentProfile();
+}
+
+function saveProfiles() {
+  localStorage.setItem("colourFocusProfiles", JSON.stringify(profilesData));
+}
+
+function setActiveProfile(id) {
+  if (!profilesData.profiles[id]) return;
+
+  profilesData.activeId = id;
+  currentProfile = profilesData.profiles[id];
+
+  saveProfiles();
+  applyProfileToUI();
+  initWeeklyForCurrentProfile();
+}
+
+function applyProfileToUI() {
+  bestScore = currentProfile.bestScore || 0;
+  bestLevel = currentProfile.bestLevel || 1;
+
+  bestScoreValueEl.textContent = bestScore;
+  bestLevelValueEl.textContent = bestLevel;
+}
+
+function renderProfileList() {
+  profileListEl.innerHTML = "";
+
+  const ids = Object.keys(profilesData.profiles);
+
+  ids.forEach(id => {
+    const p = profilesData.profiles[id];
+    const btn = document.createElement("button");
+
+    btn.className = "profile-btn";
+    if (id === profilesData.activeId) btn.classList.add("active");
+
+    btn.textContent = p.username;
+    btn.onclick = () => {
+      setActiveProfile(id);
+      renderProfileList();
+    };
+
+    profileListEl.appendChild(btn);
+  });
+
+  addProfileBtn.style.display = ids.length >= 3 ? "none" : "block";
+}
+
+function showProfileOverlay() {
+  renderProfileList();
+  profileOverlay.style.display = "flex";
+}
+
+function hideProfileOverlay() {
+  profileOverlay.style.display = "none";
 }
 
 function initWeeklyForCurrentProfile() {
-    const weekStartMs = getCurrentWeekStartMs();
+  const weekStartMs = getCurrentWeekStartMs();
 
-    if (!currentProfile.weekly || typeof currentProfile.weekly.weekStart !== "number") {
-        currentProfile.weekly = {
-            weekStart: weekStartMs,
-            bestScore: 0,
-            bestLevel: 1,
-            runs: []
-        };
-        saveProfiles();
-        return;
-    }
+  if (!currentProfile.weekly || typeof currentProfile.weekly.weekStart !== "number") {
+    currentProfile.weekly = {
+      weekStart: weekStartMs,
+      bestScore: 0,
+      bestLevel: 1,
+      runs: []
+    };
 
-    if (currentProfile.weekly.weekStart < weekStartMs) {
-        awardMedalsForWeek(currentProfile);
-        currentProfile.weekly = {
-            weekStart: weekStartMs,
-            bestScore: 0,
-            bestLevel: 1,
-            runs: []
-        };
-        saveProfiles();
-    }
+    saveProfiles();
+    return;
+  }
+
+  if (currentProfile.weekly.weekStart < weekStartMs) {
+    awardMedalsForWeek(currentProfile);
+
+    currentProfile.weekly = {
+      weekStart: weekStartMs,
+      bestScore: 0,
+      bestLevel: 1,
+      runs: []
+    };
+
+    saveProfiles();
+  }
 }
 
 function awardMedalsForWeek(profile) {
-    const w = profile.weekly;
-    if (!w || !w.runs || w.runs.length === 0) return;
+  const w = profile.weekly;
+  if (!w || !w.runs || w.runs.length === 0) return;
 
-    const sorted = [...w.runs].sort((a, b) => b.score - a.score);
-    const medals = ["gold", "silver", "bronze"];
+  const sorted = [...w.runs].sort((a, b) => b.score - a.score);
+  const medals = ["gold", "silver", "bronze"];
 
-    if (!profile.achievements) profile.achievements = [];
+  if (!profile.achievements) profile.achievements = [];
 
-    for (let i = 0; i < 3 && i < sorted.length; i++) {
-        profile.achievements.push({
-            medal: medals[i],
-            weekStart: w.weekStart
-        });
-    }
+  for (let i = 0; i < 3 && i < sorted.length; i++) {
+    profile.achievements.push({
+      medal: medals[i],
+      weekStart: w.weekStart
+    });
+  }
 }
 
 function recordWeeklyRun(score, level, pct) {
-    const w = currentProfile.weekly;
-    if (!w) return;
+  const w = currentProfile.weekly;
+  if (!w) return;
 
-    if (score > w.bestScore) w.bestScore = score;
-    if (level > w.bestLevel) w.bestLevel = level;
+  if (score > w.bestScore) w.bestScore = score;
+  if (level > w.bestLevel) w.bestLevel = level;
 
-    w.runs.push({
-        score,
-        level,
-        accuracy: pct,
-        date: new Date().toISOString().slice(0, 10),
-        name: currentProfile.username
-    });
+  w.runs.push({
+    score,
+    level,
+    accuracy: pct,
+    date: new Date().toISOString().slice(0, 10),
+    name: currentProfile.username
+  });
 
-    if (w.runs.length > 10) {
-        w.runs = w.runs.slice(w.runs.length - 10);
-    }
+  if (w.runs.length > 10) {
+    w.runs = w.runs.slice(w.runs.length - 10);
+  }
 
-    saveProfiles();
-    submitRunToGlobalLeaderboard(score, level, pct);
+  saveProfiles();
+  submitRunToGlobalLeaderboard(score, level, pct);
 }
 
 function formatTime(sec) {
-    return `00:${sec.toString().padStart(2, "0")}`;
+  const minutes = Math.floor(sec / 60);
+  const seconds = sec % 60;
+  return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 }
 
 function updateAccuracy() {
-    const total = correct + wrong;
-    const pct = total === 0 ? 0 : Math.round((correct / total) * 100);
-    accuracyEl.textContent = `${pct}% (${correct} / ${total})`;
+  const total = correct + wrong;
+  const pct = total === 0 ? 0 : Math.round((correct / total) * 100);
+
+  accuracyEl.textContent = `${pct}% (${correct} / ${total})`;
 }
 
 function updateLives() {
-    livesEl.textContent = "❤️".repeat(lives) + "🤍".repeat(3 - lives);
+  livesEl.textContent = "❤️".repeat(lives) + "🤍".repeat(3 - lives);
 }
 
 function getGridSize(level) {
-    if (level <= 2) return 2;
-    if (level <= 4) return 3;
-    if (level <= 7) return 4;
-    if (level <= 11) return 5;
-    return 6;
+  if (level <= 2) return 2;
+  if (level <= 4) return 3;
+  if (level <= 7) return 4;
+  if (level <= 11) return 5;
+  return 6;
 }
 
 function getDelta(level) {
-    const start = 14;
-    const end = 3;
-    const t = Math.min(level - 1, 20) / 20;
-    return start - t * (start - end);
+  const start = 14;
+  const end = 3;
+  const t = Math.min(level - 1, 20) / 20;
+
+  return start - t * (start - end);
 }
 
 function hsl(h, s, l) {
-    return `hsl(${h}, ${s}%, ${l}%)`;
+  return `hsl(${h}, ${s}%, ${l}%)`;
 }
 
 function hideAllOverlays() {
-    pauseOverlay.style.display = "none";
-    resultsOverlay.style.display = "none";
-    leaderboardOverlay.style.display = "none";
-    nameOverlay.style.display = "none";
-    profileOverlay.style.display = "none";
-    achievementsOverlay.style.display = "none";
+  pauseOverlay.style.display = "none";
+  resultsOverlay.style.display = "none";
+  leaderboardOverlay.style.display = "none";
+  nameOverlay.style.display = "none";
+  profileOverlay.style.display = "none";
+  achievementsOverlay.style.display = "none";
+}
+
+function keepMainButtonsVisible() {
+  pauseBtn.style.display = gameActive ? "inline-block" : "none";
+  restartBtn.style.display = gameActive ? "inline-block" : "none";
+  leaderboardBtn.style.display = "inline-block";
+  achievementsBtn.style.display = "inline-block";
 }
 
 function updateBestLevelIfNeeded() {
-    if (level > bestLevel) {
-        bestLevel = level;
-        bestLevelValueEl.textContent = bestLevel;
-        currentProfile.bestLevel = bestLevel;
-        saveProfiles();
-    }
+  if (level > bestLevel) {
+    bestLevel = level;
+    bestLevelValueEl.textContent = bestLevel;
+    currentProfile.bestLevel = bestLevel;
+    saveProfiles();
+  }
 }
 
 function moveToNextPuzzle() {
-    level++;
-    updateBestLevelIfNeeded();
-    createPuzzle();
+  level++;
+  updateBestLevelIfNeeded();
+  createPuzzle();
 }
 
 function addScoreForCorrectClick() {
-    const now = performance.now();
-    let rtMs = 500;
+  const now = performance.now();
+  const rtMs = lastClickTime === null ? 500 : now - lastClickTime;
 
-    if (lastClickTime !== null) {
-        rtMs = now - lastClickTime;
-    }
+  lastClickTime = now;
 
-    lastClickTime = now;
+  const base = level * 5;
+  const speedBonus = Math.max(0, 50 - rtMs / 20);
+  const gained = Math.round(base + speedBonus);
 
-    const base = level * 5;
-    const speedBonus = Math.max(0, 50 - rtMs / 20);
-    const gained = Math.round(base + speedBonus);
+  score += gained;
+  scoreValueEl.textContent = score;
 
-    score += gained;
-    scoreValueEl.textContent = score;
-
-    if (score > bestScore) {
-        bestScore = score;
-        bestScoreValueEl.textContent = bestScore;
-        currentProfile.bestScore = bestScore;
-        saveProfiles();
-    }
+  if (score > bestScore) {
+    bestScore = score;
+    bestScoreValueEl.textContent = bestScore;
+    currentProfile.bestScore = bestScore;
+    saveProfiles();
+  }
 }
 
 function createPuzzle() {
-    const size = getGridSize(level);
+  const size = getGridSize(level);
 
-    feedbackActive = false;
-    gridEl.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
-    gridEl.innerHTML = "";
+  feedbackActive = false;
+  gridEl.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+  gridEl.innerHTML = "";
 
-    const baseH = Math.floor(Math.random() * 360);
-    const baseS = 40 + Math.random() * 30;
-    const baseL = 30 + Math.random() * 25;
-    const delta = getDelta(level);
-    const oddL = Math.min(baseL + delta, 95);
-    const oddH = (baseH + (Math.random() - 0.5) * 6 + 360) % 360;
-    const baseCol = hsl(baseH, baseS, baseL);
-    const oddCol = hsl(oddH, baseS, oddL);
-    const total = size * size;
+  const baseH = Math.floor(Math.random() * 360);
+  const baseS = 40 + Math.random() * 30;
+  const baseL = 30 + Math.random() * 25;
 
-    oddIndex = Math.floor(Math.random() * total);
+  const delta = getDelta(level);
+  const oddL = Math.min(baseL + delta, 95);
+  const oddH = (baseH + (Math.random() - 0.5) * 6 + 360) % 360;
 
-    for (let i = 0; i < total; i++) {
-        const tile = document.createElement("div");
-        tile.className = "tile";
-        tile.style.background = i === oddIndex ? oddCol : baseCol;
-        tile.dataset.index = i;
-        tile.onclick = onTileClick;
-        gridEl.appendChild(tile);
-    }
+  const baseCol = hsl(baseH, baseS, baseL);
+  const oddCol = hsl(oddH, baseS, oddL);
 
-    levelLabelEl.textContent = `Level ${level}`;
+  const total = size * size;
+  oddIndex = Math.floor(Math.random() * total);
+
+  for (let i = 0; i < total; i++) {
+    const tile = document.createElement("div");
+
+    tile.className = "tile";
+    tile.style.background = i === oddIndex ? oddCol : baseCol;
+    tile.dataset.index = i;
+    tile.onclick = onTileClick;
+
+    gridEl.appendChild(tile);
+  }
+
+  levelLabelEl.textContent = `Level ${level}`;
 }
 
 function finishWrongAnswerTurn() {
-    if (lives <= 0) {
-        feedbackActive = false;
-        endSession();
-        return;
-    }
+  if (lives <= 0) {
+    feedbackActive = false;
+    endSession();
+    return;
+  }
 
-    moveToNextPuzzle();
+  moveToNextPuzzle();
 }
 
 function onTileClick(e) {
-    if (!gameActive || paused || feedbackActive) return;
+  if (!gameActive || paused || feedbackActive) return;
 
-    const clickedTile = e.target;
-    const index = parseInt(clickedTile.dataset.index, 10);
-    const isCorrect = index === oddIndex;
+  const clickedTile = e.target;
+  const index = parseInt(clickedTile.dataset.index, 10);
 
-    if (isCorrect) {
-        correct++;
-        addScoreForCorrectClick();
-        updateAccuracy();
-        moveToNextPuzzle();
-        return;
-    }
-
-    wrong++;
-    lives--;
-    feedbackActive = true;
-
-    updateLives();
+  if (index === oddIndex) {
+    correct++;
+    addScoreForCorrectClick();
     updateAccuracy();
+    moveToNextPuzzle();
+    return;
+  }
 
-    const correctTile = gridEl.children[oddIndex];
+  wrong++;
+  lives--;
+  feedbackActive = true;
 
-    clickedTile.classList.add("wrong-answer-feedback");
+  updateLives();
+  updateAccuracy();
 
-    setTimeout(() => {
-        clickedTile.classList.remove("wrong-answer-feedback");
+  const correctTile = gridEl.children[oddIndex];
 
-        if (window.glimpseCorrectThenContinue) {
-            window.glimpseCorrectThenContinue(correctTile, finishWrongAnswerTurn, {
-                glimpseMs: 500,
-                delayBefore: 80
-            });
-        } else {
-            if (correctTile) correctTile.classList.add("correct-glimpse");
+  clickedTile.classList.add("wrong-answer-feedback");
 
-            setTimeout(() => {
-                if (correctTile) correctTile.classList.remove("correct-glimpse");
-                finishWrongAnswerTurn();
-            }, 500);
-        }
-    }, 250);
+  setTimeout(() => {
+    clickedTile.classList.remove("wrong-answer-feedback");
+
+    if (window.glimpseCorrectThenContinue) {
+      window.glimpseCorrectThenContinue(correctTile, finishWrongAnswerTurn, {
+        glimpseMs: 500,
+        delayBefore: 80
+      });
+    } else {
+      if (correctTile) correctTile.classList.add("correct-glimpse");
+
+      setTimeout(() => {
+        if (correctTile) correctTile.classList.remove("correct-glimpse");
+        finishWrongAnswerTurn();
+      }, 500);
+    }
+  }, 250);
 }
 
 function updateTimer() {
-    timerValueEl.textContent = formatTime(sessionRemaining);
+  timerValueEl.textContent = formatTime(sessionRemaining);
 }
 
 function startSession() {
-    clearInterval(sessionTimer);
-    hideAllOverlays();
+  clearInterval(sessionTimer);
+  hideAllOverlays();
 
-    gameActive = true;
-    paused = false;
-    feedbackActive = false;
+  gameActive = true;
+  paused = false;
+  feedbackActive = false;
 
-    level = 1;
-    score = 0;
-    correct = 0;
-    wrong = 0;
-    lives = 3;
-    lastClickTime = performance.now();
+  level = 1;
+  score = 0;
+  correct = 0;
+  wrong = 0;
+  lives = 3;
+  lastClickTime = performance.now();
 
-    scoreValueEl.textContent = score;
+  scoreValueEl.textContent = score;
 
-    updateLives();
-    updateAccuracy();
-    createPuzzle();
+  updateLives();
+  updateAccuracy();
+  createPuzzle();
 
-    sessionRemaining = sessionSeconds;
-    updateTimer();
+  sessionRemaining = sessionSeconds;
+  updateTimer();
 
-    startBtn.style.display = "none";
-    pauseBtn.style.display = "inline-block";
-    restartBtn.style.display = "inline-block";
-    leaderboardBtn.style.display = "none";
-    achievementsBtn.style.display = "none";
+  startBtn.style.display = "none";
+  keepMainButtonsVisible();
 
-    sessionTimer = setInterval(() => {
-        if (!paused) {
-            sessionRemaining--;
-            updateTimer();
+  sessionTimer = setInterval(() => {
+    if (!paused) {
+      sessionRemaining--;
+      updateTimer();
 
-            if (sessionRemaining <= 0) {
-                endSession();
-            }
-        }
-    }, 1000);
+      if (sessionRemaining <= 0) {
+        endSession();
+      }
+    }
+  }, 1000);
+}
+
+function showResultsOverlay(pct, total) {
+  resultsScore.textContent = `Score: ${score}`;
+  resultsAccuracy.textContent = `Accuracy: ${pct}% (${correct}/${total})`;
+  resultsLevel.textContent = `Level Reached: ${level}`;
+  resultsBest.textContent = `Best Score: ${bestScore} • Best Level: ${bestLevel}`;
+
+  resultsOverlay.style.display = "flex";
+
+  startBtn.style.display = "inline-block";
+  gameActive = false;
+  keepMainButtonsVisible();
+}
+
+function endSession() {
+  if (!gameActive) return;
+
+  gameActive = false;
+  paused = false;
+  feedbackActive = false;
+
+  clearInterval(sessionTimer);
+
+  const total = correct + wrong;
+  const pct = total === 0 ? 0 : Math.round((correct / total) * 100);
+
+  recordWeeklyRun(score, level, pct);
+
+  if (window.explodeAllThenShowStats) {
+    window.explodeAllThenShowStats(() => {
+      showResultsOverlay(pct, total);
+    }, {
+      selector: ".tile",
+      duration: 600,
+      distance: 300,
+      popBefore: true
+    });
+  } else {
+    showResultsOverlay(pct, total);
+  }
+}
+
+function getRank(score) {
+  if (score >= 10000) return "MASTER";
+  if (score >= 7000) return "DIAMOND";
+  if (score >= 5000) return "GOLD";
+  if (score >= 3000) return "SILVER";
+  return "BRONZE";
+}
+
+function applyRankPill(rank) {
+  lbRankPill.className = "rank-pill";
+
+  if (rank === "MASTER") lbRankPill.classList.add("rank-master");
+  else if (rank === "DIAMOND") lbRankPill.classList.add("rank-diamond");
+  else if (rank === "GOLD") lbRankPill.classList.add("rank-gold");
+  else if (rank === "SILVER") lbRankPill.classList.add("rank-silver");
+  else lbRankPill.classList.add("rank-bronze");
+
+  lbRankPill.textContent = rank;
+}
+
+function formatResetTime() {
+  const nextMonday = getCurrentWeekStartMs() + 7 * 24 * 60 * 60 * 1000;
+  const diff = Math.max(0, nextMonday - Date.now());
+
+  const days = Math.floor(diff / (24 * 60 * 60 * 1000));
+  const hours = Math.floor((diff % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+
+  return `Resets in ${days} day${days !== 1 ? "s" : ""}, ${hours} hour${hours !== 1 ? "s" : ""}`;
+}
+
+function renderLeaderboard() {
+  initWeeklyForCurrentProfile();
+
+  const w = currentProfile.weekly;
+  const rank = getRank(w.bestScore || 0);
+
+  applyRankPill(rank);
+
+  lbBest.textContent = `Weekly best: ${w.bestScore || 0} pts • Level ${w.bestLevel || 1}`;
+  lbReset.textContent = formatResetTime();
+  lbUsername.textContent = `Current name: ${currentProfile.username}`;
+
+  lbRuns.innerHTML = "";
+
+  if (!w.runs || w.runs.length === 0) {
+    lbRuns.textContent = "No runs yet this week. Play a game to start filling this in.";
+    return;
+  }
+
+  const sortedRuns = [...w.runs].sort((a, b) => b.score - a.score);
+  const maxScore = Math.max(...sortedRuns.map(r => r.score), 1);
+
+  sortedRuns.forEach((run, idx) => {
+    const row = document.createElement("div");
+    row.className = "lb-run-row";
+
+    const label = document.createElement("div");
+    label.className = "lb-run-label";
+
+    label.innerHTML = `
+      <span>#${idx + 1}</span>
+      <span>${run.name || "Player"} • ${run.score} pts • L${run.level} • ${run.accuracy}%</span>
+    `;
+
+    const barOuter = document.createElement("div");
+    barOuter.className = "lb-bar-outer";
+
+    const barInner = document.createElement("div");
+    barInner.className = "lb-bar-inner";
+
+    const width = Math.max(5, (run.score / maxScore) * 100);
+    barInner.style.width = width + "%";
+
+    let color = "#f97373";
+    if (run.accuracy >= 80) color = "#22c55e";
+    else if (run.accuracy >= 60) color = "#eab308";
+
+    barInner.style.background = color;
+
+    barOuter.appendChild(barInner);
+    row.appendChild(label);
+    row.appendChild(barOuter);
+    lbRuns.appendChild(row);
+  });
+}
+
+function switchLbTab(tab) {
+  const myPanel = document.getElementById("lb-panel-my");
+  const globalPanel = document.getElementById("lb-panel-global");
+  const myTab = document.getElementById("lb-tab-my");
+  const globalTab = document.getElementById("lb-tab-global");
+
+  if (tab === "my") {
+    myPanel.classList.add("active");
+    globalPanel.classList.remove("active");
+    myTab.classList.add("active");
+    globalTab.classList.remove("active");
+  } else {
+    myPanel.classList.remove("active");
+    globalPanel.classList.add("active");
+    myTab.classList.remove("active");
+    globalTab.classList.add("active");
+  }
+}
+
+function formatWeekLabel(weekStart) {
+  const d = new Date(weekStart);
+  const options = { day: "numeric", month: "long", year: "numeric" };
+
+  return "Week of " + d.toLocaleDateString(undefined, options);
+}
+
+function renderAchievements() {
+  achListEl.innerHTML = "";
+
+  const ach = currentProfile.achievements || [];
+
+  if (ach.length === 0) {
+    achListEl.textContent = "No medals yet. Finish a week with runs to earn medals.";
+    return;
+  }
+
+  ach.slice().reverse().forEach(entry => {
+    const card = document.createElement("div");
+    card.className = `medal-card medal-${entry.medal}`;
+
+    const icon = entry.medal === "gold" ? "🥇" : entry.medal === "silver" ? "🥈" : "🥉";
+    const label = `${entry.medal.toUpperCase()} MEDAL`;
+
+    const title = document.createElement("div");
+    title.className = "medal-title";
+    title.textContent = `${icon} ${label}`;
+
+    const date = document.createElement("div");
+    date.className = "medal-date";
+    date.textContent = formatWeekLabel(entry.weekStart);
+
+    card.appendChild(title);
+    card.appendChild(date);
+    achListEl.appendChild(card);
+  });
+}
+
+function setUsername(newName) {
+  const trimmed = newName.trim();
+  if (trimmed.length === 0) return;
+
+  currentProfile.username = trimmed;
+  saveProfiles();
+}
+
+function pauseGame() {
+  if (!gameActive || paused) return;
+
+  paused = true;
+  pauseOverlay.style.display = "flex";
+}
+
+function continueGame() {
+  if (!paused) return;
+
+  paused = false;
+  pauseOverlay.style.display = "none";
+}
+
+startBtn.onclick = startSession;
+restartBtn.onclick = () => {
+  gameActive = false;
+  startSession();
+};
+pauseBtn.onclick = pauseGame;
+continueBtn.onclick = continueGame;
+playAgainBtn.onclick = startSession;
+
+leaderboardBtn.onclick = () => {
+  renderLeaderboard();
+  leaderboardOverlay.style.display = "flex";
+};
+
+lbCloseBtn.onclick = () => {
+  leaderboardOverlay.style.display = "none";
+};
+
+lbNameBtn.onclick = () => {
+  nameInput.value = currentProfile.username || "";
+  nameOverlay.style.display = "flex";
+};
+
+nameSaveBtn.onclick = () => {
+  const val = nameInput.value;
+
+  if (val.trim().length > 0) {
+    setUsername(val);
+  }
+
+  nameOverlay.style.display = "none";
+};
+
+lbProfileBtn.onclick = () => {
+  showProfileOverlay();
+};
+
+addProfileBtn.onclick = () => {
+  const count = Object.keys(profilesData.profiles).length;
+  if (count >= 3) return;
+
+  const p = createNewProfile();
+  profilesData.profiles[p.id] = p;
+
+  setActiveProfile(p.id);
+  renderProfileList();
+};
+
+profileCloseBtn.onclick = () => {
+  hideProfileOverlay();
+};
+
+achievementsBtn.onclick = () => {
+  renderAchievements();
+  achievementsOverlay.style.display = "flex";
+};
+
+achCloseBtn.onclick = () => {
+  achievementsOverlay.style.display = "none";
+};
+
+nameOverlay.addEventListener("click", e => {
+  if (e.target === nameOverlay) {
+    nameOverlay.style.display = "none";
+  }
+});
+
+profileOverlay.addEventListener("click", e => {
+  if (e.target === profileOverlay) {
+    hideProfileOverlay();
+  }
+});
+
+achievementsOverlay.addEventListener("click", e => {
+  if (e.target === achievementsOverlay) {
+    achievementsOverlay.style.display = "none";
+  }
+});
+
+leaderboardOverlay.addEventListener("click", e => {
+  if (e.target === leaderboardOverlay) {
+    leaderboardOverlay.style.display = "none";
+  }
+});
+
+pauseOverlay.addEventListener("click", e => {
+  if (e.target === pauseOverlay) {
+    continueGame();
+  }
+});
+
+function submitRunToGlobalLeaderboard(score, level, pct) {
+  // Connect this to your backend later if you want a real global leaderboard.
+}
+
+loadProfiles();
+keepMainButtonsVisible();
+
+if (Object.keys(profilesData.profiles).length > 1) {
+  showProfileOverlay();
 }
 </script>
 </body>
