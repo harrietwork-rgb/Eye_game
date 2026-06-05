@@ -1,26 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag gtag.js -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-NFRD369Q9E"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  gtag("js", new Date());
+  gtag("config", "G-NFRD369Q9E", { send_page_view: true });
 
-  // Configure GA4 measurement
-  gtag('config', 'G-NFRD369Q9E', { send_page_view: true });
-
-  // Debug helper: set to false for production
   window.GA_DEBUG = true;
   if (window.GA_DEBUG) {
-    gtag('set', {'debug_mode': true});
-    console.info('[GA] Debug mode enabled');
+    gtag("set", { debug_mode: true });
+    console.info("[GA] Debug mode enabled");
   }
 </script>
-    
+
 <meta charset="UTF-8">
-<title>Colour Focus – Perception Test</title>
+<title>Colour Focus - Perception Test</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link rel="stylesheet" href="styles/explosion.css">
@@ -56,6 +52,7 @@
         padding: 20px;
         transition: background 0.3s, color 0.3s;
     }
+
     .app {
         width: 100%;
         max-width: 420px;
@@ -66,16 +63,19 @@
         border: 1px solid var(--border);
         transition: background 0.3s, border 0.3s;
     }
+
     header {
         padding-bottom: 10px;
         border-bottom: 1px solid var(--border);
         margin-bottom: 10px;
         position: relative;
     }
+
     h1 {
         font-size: 20px;
         margin: 0 0 4px;
     }
+
     .subtitle {
         font-size: 13px;
         color: var(--text-soft);
@@ -99,6 +99,7 @@
         justify-content: space-between;
         margin: 12px 0;
     }
+
     .box {
         background: var(--box-bg);
         padding: 10px;
@@ -107,18 +108,24 @@
         text-align: center;
         border: 1px solid var(--border);
         transition: background 0.3s, border 0.3s;
+        box-sizing: border-box;
     }
+
     .box-label {
         font-size: 12px;
         color: var(--text-soft);
         margin-bottom: 4px;
     }
+
     #timer-value {
         font-size: 24px;
         font-weight: 600;
         color: var(--accent);
     }
-    #score-value, #best-score-value, #best-level-value {
+
+    #score-value,
+    #best-score-value,
+    #best-level-value {
         font-size: 20px;
         font-weight: 600;
     }
@@ -129,6 +136,7 @@
         gap: 8px;
         margin-bottom: 8px;
     }
+
     .mid-box {
         flex: 1;
         background: var(--box-bg);
@@ -139,10 +147,12 @@
         font-size: 13px;
         transition: background 0.3s, border 0.3s;
     }
+
     #accuracy {
         font-size: 13px;
         color: var(--text-soft);
     }
+
     #lives {
         font-size: 20px;
     }
@@ -158,12 +168,14 @@
         gap: 6px;
         margin: 10px 0 14px;
     }
+
     .tile {
         width: 100%;
         padding-bottom: 100%;
         border-radius: 8px;
         cursor: pointer;
         border: 1px solid var(--border);
+        box-sizing: border-box;
     }
 
     .controls {
@@ -173,6 +185,7 @@
         gap: 6px;
         flex-wrap: wrap;
     }
+
     button {
         padding: 8px 12px;
         border-radius: 999px;
@@ -182,18 +195,24 @@
         font-size: 13px;
         white-space: nowrap;
     }
+
     .primary {
         background: var(--accent);
         color: #ffffff;
     }
+
     .ghost {
         background: var(--box-bg);
         color: var(--text-main);
         border: 1px solid var(--border);
     }
 
-    #pause-overlay, #results-overlay, #leaderboard-overlay,
-    #name-overlay, #profile-overlay, #achievements-overlay {
+    #pause-overlay,
+    #results-overlay,
+    #leaderboard-overlay,
+    #name-overlay,
+    #profile-overlay,
+    #achievements-overlay {
         position: fixed;
         inset: 0;
         background: rgba(15, 23, 42, 0.12);
@@ -201,7 +220,9 @@
         align-items: center;
         justify-content: center;
         padding: 20px;
+        z-index: 50;
     }
+
     .overlay-card {
         background: var(--box-bg);
         border-radius: 16px;
@@ -213,15 +234,18 @@
         text-align: center;
         transition: background 0.3s, border 0.3s;
     }
+
     .overlay-card h2 {
         margin: 0 0 6px;
         font-size: 18px;
     }
+
     .overlay-card p {
         margin: 4px 0;
         font-size: 13px;
         color: var(--text-soft);
     }
+
     .overlay-card button {
         margin-top: 10px;
     }
@@ -235,6 +259,7 @@
         margin-bottom: 6px;
         color: #111827;
     }
+
     .rank-bronze { background: #d97757; color: #111827; }
     .rank-silver { background: #e5e7eb; color: #111827; }
     .rank-gold { background: #facc15; color: #111827; }
@@ -252,6 +277,7 @@
         gap: 4px;
         margin-bottom: 10px;
     }
+
     .lb-tab {
         flex: 1;
         padding: 6px;
@@ -263,24 +289,22 @@
         font-weight: 600;
         cursor: pointer;
     }
+
     .lb-tab.active {
         background: var(--accent);
         color: #fff;
         border-color: var(--accent);
     }
+
     .lb-panel {
         display: none;
     }
+
     .lb-panel.active {
         display: block;
     }
-    .lb-runs {
-        margin-top: 8px;
-        max-height: 220px;
-        overflow-y: auto;
-        text-align: left;
-        font-size: 12px;
-    }
+
+    .lb-runs,
     .lb-global-list {
         margin-top: 8px;
         max-height: 260px;
@@ -288,75 +312,27 @@
         text-align: left;
         font-size: 12px;
     }
-    .lb-global-row {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 6px 4px;
-        border-bottom: 1px solid var(--border);
-    }
-    .lb-global-row:last-child {
-        border-bottom: none;
-    }
-    .lb-global-rank {
-        font-weight: 700;
-        min-width: 22px;
-        color: var(--text-soft);
-        font-size: 11px;
-    }
-    .lb-global-rank.top1 { color: #facc15; }
-    .lb-global-rank.top2 { color: #9ca3af; }
-    .lb-global-rank.top3 { color: #d97757; }
-    .lb-global-name {
-        flex: 1;
-        font-weight: 600;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .lb-global-name.me {
-        color: var(--accent);
-    }
-    .lb-global-score {
-        font-weight: 700;
-        white-space: nowrap;
-    }
-    .lb-global-level {
-        color: var(--text-soft);
-        font-size: 11px;
-        white-space: nowrap;
-    }
+
     .lb-loading {
         color: var(--text-soft);
         font-size: 12px;
         padding: 12px 0;
         text-align: center;
     }
+
     .lb-run-row {
         margin: 4px 0;
     }
+
     .lb-run-label {
         display: flex;
         justify-content: space-between;
         margin-bottom: 2px;
         gap: 4px;
     }
+
     .lb-run-label span {
         white-space: nowrap;
-    }
-    .lb-run-label span:last-child {
-        margin-left: auto;
-    }
-    .lb-bar-outer {
-        width: 100%;
-        height: 8px;
-        border-radius: 999px;
-        background: #e5e7eb;
-        overflow: hidden;
-    }
-    .lb-bar-inner {
-        height: 100%;
-        border-radius: 999px;
     }
 
     .name-input {
@@ -377,6 +353,7 @@
         flex-direction: column;
         gap: 6px;
     }
+
     .profile-btn {
         width: 100%;
         text-align: left;
@@ -387,6 +364,7 @@
         cursor: pointer;
         font-size: 14px;
     }
+
     .profile-btn.active {
         border-color: var(--accent);
         background: var(--accent-soft);
@@ -402,21 +380,18 @@
         flex-direction: column;
         gap: 8px;
     }
+
     .medal-card {
         border-radius: 12px;
         padding: 10px 12px;
         color: #111827;
         box-shadow: 0 4px 10px rgba(15, 23, 42, 0.15);
     }
-    .medal-gold {
-        background: #facc15;
-    }
-    .medal-silver {
-        background: #e5e7eb;
-    }
-    .medal-bronze {
-        background: #d97757;
-    }
+
+    .medal-gold { background: #facc15; }
+    .medal-silver { background: #e5e7eb; }
+    .medal-bronze { background: #d97757; }
+
     .medal-title {
         font-weight: 700;
         margin-bottom: 4px;
@@ -424,6 +399,7 @@
         align-items: center;
         gap: 6px;
     }
+
     .medal-date {
         font-size: 12px;
         opacity: 0.9;
@@ -453,7 +429,7 @@
     <div class="top-row">
         <div class="box">
             <div class="box-label">Time</div>
-            <div id="timer-value">01:00</div>
+            <div id="timer-value">00:60</div>
         </div>
         <div class="box">
             <div class="box-label">Score</div>
@@ -511,7 +487,6 @@
             <button class="lb-tab" id="lb-tab-global" onclick="switchLbTab('global')">Global</button>
         </div>
 
-        <!-- My Week panel -->
         <div id="lb-panel-my" class="lb-panel active">
             <div id="lb-rank-pill" class="rank-pill rank-bronze">BRONZE</div>
             <p id="lb-best"></p>
@@ -521,11 +496,10 @@
             <div id="lb-runs" class="lb-runs"></div>
         </div>
 
-        <!-- Global panel -->
         <div id="lb-panel-global" class="lb-panel">
             <p style="font-size:12px;color:var(--text-soft);margin:0 0 4px">Top players this week across all devices</p>
             <div id="lb-global-list" class="lb-global-list">
-                <div class="lb-loading">Loading…</div>
+                <div class="lb-loading">Loading...</div>
             </div>
         </div>
 
@@ -539,7 +513,7 @@
     <div class="overlay-card">
         <h2>Set Your Name</h2>
         <p>Choose the name that appears on your leaderboard.</p>
-        <input id="name-input" class="name-input" maxlength="20" />
+        <input id="name-input" class="name-input" maxlength="20">
         <button id="name-save-btn" class="primary">Save</button>
     </div>
 </div>
@@ -566,30 +540,24 @@
 <script defer src="scripts/explosion-and-feedback.js"></script>
 
 <script>
-/* GAME STATE */
 let level = 1;
 let score = 0;
 let correct = 0;
 let wrong = 0;
 let lives = 3;
-
 let bestScore = 0;
 let bestLevel = 1;
-
 let sessionSeconds = 60;
 let sessionRemaining = sessionSeconds;
 let sessionTimer = null;
-
 let gameActive = false;
 let paused = false;
+let feedbackActive = false;
 let oddIndex = -1;
 let lastClickTime = null;
-
-/* PROFILE / DATA STATE */
 let profilesData = null;
 let currentProfile = null;
 
-/* ELEMENTS */
 const gridEl = document.getElementById("grid");
 const timerValueEl = document.getElementById("timer-value");
 const scoreValueEl = document.getElementById("score-value");
@@ -598,14 +566,12 @@ const bestLevelValueEl = document.getElementById("best-level-value");
 const levelLabelEl = document.getElementById("level-label");
 const accuracyEl = document.getElementById("accuracy");
 const livesEl = document.getElementById("lives");
-
 const pauseOverlay = document.getElementById("pause-overlay");
 const resultsOverlay = document.getElementById("results-overlay");
 const leaderboardOverlay = document.getElementById("leaderboard-overlay");
 const nameOverlay = document.getElementById("name-overlay");
 const profileOverlay = document.getElementById("profile-overlay");
 const achievementsOverlay = document.getElementById("achievements-overlay");
-
 const pauseBtn = document.getElementById("pause-btn");
 const continueBtn = document.getElementById("continue-btn");
 const startBtn = document.getElementById("start-btn");
@@ -616,35 +582,29 @@ const achievementsBtn = document.getElementById("achievements-btn");
 const lbCloseBtn = document.getElementById("lb-close-btn");
 const lbNameBtn = document.getElementById("lb-name-btn");
 const lbProfileBtn = document.getElementById("lb-profile-btn");
-
 const themeToggle = document.getElementById("theme-toggle");
-
 const resultsScore = document.getElementById("results-score");
 const resultsAccuracy = document.getElementById("results-accuracy");
 const resultsLevel = document.getElementById("results-level");
 const resultsBest = document.getElementById("results-best");
-
 const lbRankPill = document.getElementById("lb-rank-pill");
 const lbBest = document.getElementById("lb-best");
 const lbReset = document.getElementById("lb-reset");
 const lbRuns = document.getElementById("lb-runs");
 const lbUsername = document.getElementById("lb-username");
-
 const nameInput = document.getElementById("name-input");
 const nameSaveBtn = document.getElementById("name-save-btn");
-
 const profileListEl = document.getElementById("profile-list");
 const addProfileBtn = document.getElementById("add-profile-btn");
 const profileCloseBtn = document.getElementById("profile-close-btn");
-
 const achListEl = document.getElementById("ach-list");
 const achCloseBtn = document.getElementById("ach-close-btn");
 
-/* DARK MODE */
 if (localStorage.getItem("colourFocusTheme") === "dark") {
     document.body.classList.add("dark");
     themeToggle.textContent = "☀️";
 }
+
 themeToggle.onclick = () => {
     document.body.classList.toggle("dark");
     if (document.body.classList.contains("dark")) {
@@ -656,10 +616,8 @@ themeToggle.onclick = () => {
     }
 };
 
-/* PROFILE SYSTEM */
 function createRandomUsername() {
-    const rand = Math.floor(1000 + Math.random() * 9000);
-    return `CF-${rand}`;
+    return `CF-${Math.floor(1000 + Math.random() * 9000)}`;
 }
 
 function createNewProfile() {
@@ -688,6 +646,7 @@ function loadProfiles() {
             profilesData = null;
         }
     }
+
     if (!profilesData || !profilesData.profiles || Object.keys(profilesData.profiles).length === 0) {
         const profile = createNewProfile();
         profilesData = {
@@ -697,10 +656,11 @@ function loadProfiles() {
             }
         };
     }
+
     if (!profilesData.activeId || !profilesData.profiles[profilesData.activeId]) {
-        const firstId = Object.keys(profilesData.profiles)[0];
-        profilesData.activeId = firstId;
+        profilesData.activeId = Object.keys(profilesData.profiles)[0];
     }
+
     currentProfile = profilesData.profiles[profilesData.activeId];
     saveProfiles();
     applyProfileToUI();
@@ -730,6 +690,7 @@ function applyProfileToUI() {
 function renderProfileList() {
     profileListEl.innerHTML = "";
     const ids = Object.keys(profilesData.profiles);
+
     ids.forEach(id => {
         const p = profilesData.profiles[id];
         const btn = document.createElement("button");
@@ -743,12 +704,7 @@ function renderProfileList() {
         profileListEl.appendChild(btn);
     });
 
-    const count = ids.length;
-    if (count >= 3) {
-        addProfileBtn.style.display = "none";
-    } else {
-        addProfileBtn.style.display = "block";
-    }
+    addProfileBtn.style.display = ids.length >= 3 ? "none" : "block";
 }
 
 function showProfileOverlay() {
@@ -760,7 +716,6 @@ function hideProfileOverlay() {
     profileOverlay.style.display = "none";
 }
 
-/* WEEKLY + MEDALS */
 function getCurrentWeekStartMs() {
     const now = new Date();
     const day = now.getUTCDay();
@@ -771,6 +726,7 @@ function getCurrentWeekStartMs() {
 
 function initWeeklyForCurrentProfile() {
     const weekStartMs = getCurrentWeekStartMs();
+
     if (!currentProfile.weekly || typeof currentProfile.weekly.weekStart !== "number") {
         currentProfile.weekly = {
             weekStart: weekStartMs,
@@ -781,8 +737,8 @@ function initWeeklyForCurrentProfile() {
         saveProfiles();
         return;
     }
-    const w = currentProfile.weekly;
-    if (w.weekStart < weekStartMs) {
+
+    if (currentProfile.weekly.weekStart < weekStartMs) {
         awardMedalsForWeek(currentProfile);
         currentProfile.weekly = {
             weekStart: weekStartMs,
@@ -797,9 +753,12 @@ function initWeeklyForCurrentProfile() {
 function awardMedalsForWeek(profile) {
     const w = profile.weekly;
     if (!w || !w.runs || w.runs.length === 0) return;
+
     const sorted = [...w.runs].sort((a, b) => b.score - a.score);
     const medals = ["gold", "silver", "bronze"];
+
     if (!profile.achievements) profile.achievements = [];
+
     for (let i = 0; i < 3 && i < sorted.length; i++) {
         profile.achievements.push({
             medal: medals[i],
@@ -811,8 +770,10 @@ function awardMedalsForWeek(profile) {
 function recordWeeklyRun(score, level, pct) {
     const w = currentProfile.weekly;
     if (!w) return;
+
     if (score > w.bestScore) w.bestScore = score;
     if (level > w.bestLevel) w.bestLevel = level;
+
     w.runs.push({
         score,
         level,
@@ -820,14 +781,15 @@ function recordWeeklyRun(score, level, pct) {
         date: new Date().toISOString().slice(0, 10),
         name: currentProfile.username
     });
+
     if (w.runs.length > 10) {
         w.runs = w.runs.slice(w.runs.length - 10);
     }
+
     saveProfiles();
     submitRunToGlobalLeaderboard(score, level, pct);
 }
 
-/* HELPERS */
 function formatTime(sec) {
     return `00:${sec.toString().padStart(2, "0")}`;
 }
@@ -851,7 +813,8 @@ function getGridSize(level) {
 }
 
 function getDelta(level) {
-    const start = 14, end = 3;
+    const start = 14;
+    const end = 3;
     const t = Math.min(level - 1, 20) / 20;
     return start - t * (start - end);
 }
@@ -860,17 +823,44 @@ function hsl(h, s, l) {
     return `hsl(${h}, ${s}%, ${l}%)`;
 }
 
-/* SCORING */
+function hideAllOverlays() {
+    pauseOverlay.style.display = "none";
+    resultsOverlay.style.display = "none";
+    leaderboardOverlay.style.display = "none";
+    nameOverlay.style.display = "none";
+    profileOverlay.style.display = "none";
+    achievementsOverlay.style.display = "none";
+}
+
+function updateBestLevelIfNeeded() {
+    if (level > bestLevel) {
+        bestLevel = level;
+        bestLevelValueEl.textContent = bestLevel;
+        currentProfile.bestLevel = bestLevel;
+        saveProfiles();
+    }
+}
+
+function moveToNextPuzzle() {
+    level++;
+    updateBestLevelIfNeeded();
+    createPuzzle();
+}
+
 function addScoreForCorrectClick() {
     const now = performance.now();
     let rtMs = 500;
-    if (lastClickTime !== null) rtMs = now - lastClickTime;
+
+    if (lastClickTime !== null) {
+        rtMs = now - lastClickTime;
+    }
+
     lastClickTime = now;
 
     const base = level * 5;
     const speedBonus = Math.max(0, 50 - rtMs / 20);
-
     const gained = Math.round(base + speedBonus);
+
     score += gained;
     scoreValueEl.textContent = score;
 
@@ -882,24 +872,23 @@ function addScoreForCorrectClick() {
     }
 }
 
-/* PUZZLE */
 function createPuzzle() {
     const size = getGridSize(level);
+
+    feedbackActive = false;
     gridEl.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
     gridEl.innerHTML = "";
 
     const baseH = Math.floor(Math.random() * 360);
     const baseS = 40 + Math.random() * 30;
     const baseL = 30 + Math.random() * 25;
-
     const delta = getDelta(level);
     const oddL = Math.min(baseL + delta, 95);
     const oddH = (baseH + (Math.random() - 0.5) * 6 + 360) % 360;
-
     const baseCol = hsl(baseH, baseS, baseL);
     const oddCol = hsl(oddH, baseS, oddL);
-
     const total = size * size;
+
     oddIndex = Math.floor(Math.random() * total);
 
     for (let i = 0; i < total; i++) {
@@ -914,89 +903,72 @@ function createPuzzle() {
     levelLabelEl.textContent = `Level ${level}`;
 }
 
-function onTileClick(e) {
-    if (!gameActive || paused) return;
+function finishWrongAnswerTurn() {
+    if (lives <= 0) {
+        feedbackActive = false;
+        endSession();
+        return;
+    }
 
-    const index = parseInt(e.target.dataset.index);
+    moveToNextPuzzle();
+}
+
+function onTileClick(e) {
+    if (!gameActive || paused || feedbackActive) return;
+
+    const clickedTile = e.target;
+    const index = parseInt(clickedTile.dataset.index, 10);
     const isCorrect = index === oddIndex;
 
     if (isCorrect) {
         correct++;
         addScoreForCorrectClick();
         updateAccuracy();
-
-        level++;
-        if (level > bestLevel) {
-            bestLevel = level;
-            bestLevelValueEl.textContent = bestLevel;
-            currentProfile.bestLevel = bestLevel;
-            saveProfiles();
-        }
-
-        createPuzzle();
-    } else {
-        wrong++;
-        lives--;
-        updateLives();
-        updateAccuracy();
-        
-        // Show red highlight on correct tile, then glimpse it in green
-        const correctTile = gridEl.children[oddIndex];
-        if (correctTile) {
-            correctTile.classList.add('wrong-answer-feedback');
-            
-            // After 300ms, remove red and show green glimpse
-            setTimeout(() => {
-                correctTile.classList.remove('wrong-answer-feedback');
-                
-                // Show correct tile with green highlight using the helper
-                if (window.glimpseCorrectThenContinue) {
-                    window.glimpseCorrectThenContinue(correctTile, () => {
-                        if (lives <= 0) {
-                            endSession();
-                        } else {
-                            level++;
-                            if (level > bestLevel) {
-                                bestLevel = level;
-                                bestLevelValueEl.textContent = bestLevel;
-                                currentProfile.bestLevel = bestLevel;
-                                saveProfiles();
-                            }
-                            createPuzzle();
-                        }
-                    }, { glimpseMs: 160 });
-                } else {
-                    // Fallback if helper isn't loaded
-                    setTimeout(() => {
-                        if (lives <= 0) {
-                            endSession();
-                        } else {
-                            level++;
-                            if (level > bestLevel) {
-                                bestLevel = level;
-                                bestLevelValueEl.textContent = bestLevel;
-                                currentProfile.bestLevel = bestLevel;
-                                saveProfiles();
-                            }
-                            createPuzzle();
-                        }
-                    }, 300);
-                }
-            }, 300);
-        }
+        moveToNextPuzzle();
+        return;
     }
+
+    wrong++;
+    lives--;
+    feedbackActive = true;
+
+    updateLives();
+    updateAccuracy();
+
+    const correctTile = gridEl.children[oddIndex];
+
+    clickedTile.classList.add("wrong-answer-feedback");
+
+    setTimeout(() => {
+        clickedTile.classList.remove("wrong-answer-feedback");
+
+        if (window.glimpseCorrectThenContinue) {
+            window.glimpseCorrectThenContinue(correctTile, finishWrongAnswerTurn, {
+                glimpseMs: 500,
+                delayBefore: 80
+            });
+        } else {
+            if (correctTile) correctTile.classList.add("correct-glimpse");
+
+            setTimeout(() => {
+                if (correctTile) correctTile.classList.remove("correct-glimpse");
+                finishWrongAnswerTurn();
+            }, 500);
+        }
+    }, 250);
 }
 
-/* TIMER + SESSION */
 function updateTimer() {
     timerValueEl.textContent = formatTime(sessionRemaining);
 }
 
 function startSession() {
-    if (gameActive) return;
+    clearInterval(sessionTimer);
+    hideAllOverlays();
 
     gameActive = true;
     paused = false;
+    feedbackActive = false;
 
     level = 1;
     score = 0;
@@ -1004,6 +976,8 @@ function startSession() {
     wrong = 0;
     lives = 3;
     lastClickTime = performance.now();
+
+    scoreValueEl.textContent = score;
 
     updateLives();
     updateAccuracy();
@@ -1022,98 +996,104 @@ function startSession() {
         if (!paused) {
             sessionRemaining--;
             updateTimer();
+
             if (sessionRemaining <= 0) {
-                clearInterval(sessionTimer);
                 endSession();
             }
         }
     }, 1000);
 }
 
+function showResultsOverlay(pct, total) {
+    resultsScore.textContent = `Score: ${score}`;
+    resultsAccuracy.textContent = `Accuracy: ${pct}% (${correct}/${total})`;
+    resultsLevel.textContent = `Level Reached: ${level}`;
+    resultsBest.textContent = `Best Score: ${bestScore}`;
+
+    resultsOverlay.style.display = "flex";
+
+    startBtn.style.display = "inline-block";
+    pauseBtn.style.display = "none";
+    restartBtn.style.display = "none";
+    leaderboardBtn.style.display = "inline-block";
+    achievementsBtn.style.display = "inline-block";
+}
+
 function endSession() {
+    if (!gameActive) return;
+
     gameActive = false;
+    paused = false;
+    feedbackActive = false;
+
     clearInterval(sessionTimer);
-    
+
     const total = correct + wrong;
     const pct = total === 0 ? 0 : Math.round((correct / total) * 100);
 
     recordWeeklyRun(score, level, pct);
 
-    // Trigger explosion animation on tiles before showing results
     if (window.explodeAllThenShowStats) {
         window.explodeAllThenShowStats(() => {
-            // This callback runs after explosion completes
-            resultsScore.textContent = `Score: ${score}`;
-            resultsAccuracy.textContent = `Accuracy: ${pct}% (${correct}/${total})`;
-            resultsLevel.textContent = `Level Reached: ${level}`;
-            resultsBest.textContent = `Best Score: ${bestScore}`;
-
-            resultsOverlay.style.display = "flex";
-
-            startBtn.style.display = "inline-block";
-            pauseBtn.style.display = "none";
-            restartBtn.style.display = "none";
-            leaderboardBtn.style.display = "inline-block";
-            achievementsBtn.style.display = "inline-block";
+            showResultsOverlay(pct, total);
         }, {
-            selector: '.tile',
+            selector: ".tile",
             duration: 600,
             distance: 300,
             popBefore: true
         });
     } else {
-        // Fallback if explosion helper isn't loaded
-        resultsScore.textContent = `Score: ${score}`;
-        resultsAccuracy.textContent = `Accuracy: ${pct}% (${correct}/${total})`;
-        resultsLevel.textContent = `Level Reached: ${level}`;
-        resultsBest.textContent = `Best Score: ${bestScore}`;
-
-        resultsOverlay.style.display = "flex";
-
-        startBtn.style.display = "inline-block";
-        pauseBtn.style.display = "none";
-        restartBtn.style.display = "none";
-        leaderboardBtn.style.display = "inline-block";
-        achievementsBtn.style.display = "inline-block";
+        showResultsOverlay(pct, total);
     }
 }
 
-/* EVENT LISTENERS */
 startBtn.onclick = startSession;
 restartBtn.onclick = startSession;
+playAgainBtn.onclick = startSession;
+
 pauseBtn.onclick = () => {
+    if (!gameActive) return;
     paused = true;
     pauseOverlay.style.display = "flex";
 };
+
 continueBtn.onclick = () => {
     paused = false;
     pauseOverlay.style.display = "none";
 };
-playAgainBtn.onclick = startSession;
+
 lbCloseBtn.onclick = () => {
     leaderboardOverlay.style.display = "none";
 };
+
 leaderboardBtn.onclick = () => {
     showLeaderboard();
 };
+
 achievementsBtn.onclick = () => {
     showAchievements();
 };
+
 lbNameBtn.onclick = () => {
     leaderboardOverlay.style.display = "none";
     nameInput.value = currentProfile.username;
     nameOverlay.style.display = "flex";
 };
+
 lbProfileBtn.onclick = () => {
     leaderboardOverlay.style.display = "none";
     showProfileOverlay();
 };
+
 profileCloseBtn.onclick = hideProfileOverlay;
+
 achCloseBtn.onclick = () => {
     achievementsOverlay.style.display = "none";
 };
+
 nameSaveBtn.onclick = () => {
     const newName = nameInput.value.trim();
+
     if (newName.length > 0) {
         currentProfile.username = newName;
         saveProfiles();
@@ -1121,7 +1101,17 @@ nameSaveBtn.onclick = () => {
     }
 };
 
-/* LEADERBOARD */
+addProfileBtn.onclick = () => {
+    const ids = Object.keys(profilesData.profiles);
+    if (ids.length >= 3) return;
+
+    const profile = createNewProfile();
+    profilesData.profiles[profile.id] = profile;
+
+    setActiveProfile(profile.id);
+    renderProfileList();
+};
+
 function switchLbTab(tab) {
     const myPanel = document.getElementById("lb-panel-my");
     const globalPanel = document.getElementById("lb-panel-global");
@@ -1143,37 +1133,26 @@ function switchLbTab(tab) {
 
 function showLeaderboard() {
     const w = currentProfile.weekly;
-    
-    // Rank pill
+
     if (w && w.runs && w.runs.length >= 3) {
-        const medals = w.runs.slice(0, 3).length;
-        if (medals >= 3) {
-            lbRankPill.textContent = "MASTER";
-            lbRankPill.className = "rank-pill rank-master";
-        } else {
-            lbRankPill.textContent = "GOLD";
-            lbRankPill.className = "rank-pill rank-gold";
-        }
+        lbRankPill.textContent = "MASTER";
+        lbRankPill.className = "rank-pill rank-master";
     } else {
         lbRankPill.textContent = "BRONZE";
         lbRankPill.className = "rank-pill rank-bronze";
     }
 
-    // Best score
     lbBest.textContent = `Best this week: ${w ? w.bestScore : 0}`;
 
-    // Reset date
     const nextMonday = new Date(getCurrentWeekStartMs() + 7 * 24 * 60 * 60 * 1000);
-    const resetDate = nextMonday.toLocaleDateString();
-    lbReset.textContent = `Resets: ${resetDate}`;
-
-    // Username
+    lbReset.textContent = `Resets: ${nextMonday.toLocaleDateString()}`;
     lbUsername.textContent = `Name: ${currentProfile.username}`;
 
-    // Runs
     lbRuns.innerHTML = "";
+
     if (w && w.runs) {
         const sorted = [...w.runs].sort((a, b) => b.score - a.score);
+
         sorted.forEach(run => {
             const div = document.createElement("div");
             div.className = "lb-run-row";
@@ -1192,31 +1171,32 @@ function showLeaderboard() {
 
 function showAchievements() {
     achListEl.innerHTML = "";
+
     if (currentProfile.achievements && currentProfile.achievements.length > 0) {
-        currentProfile.achievements.forEach((ach, idx) => {
+        currentProfile.achievements.forEach(ach => {
             const medalClass = `medal-${ach.medal}`;
             const medalEmoji = ach.medal === "gold" ? "🥇" : ach.medal === "silver" ? "🥈" : "🥉";
             const div = document.createElement("div");
+
             div.className = `medal-card ${medalClass}`;
             div.innerHTML = `
                 <div class="medal-title">${medalEmoji} ${ach.medal.toUpperCase()}</div>
                 <div class="medal-date">Week of ${new Date(ach.weekStart).toLocaleDateString()}</div>
             `;
+
             achListEl.appendChild(div);
         });
     } else {
         achListEl.innerHTML = '<p style="color: var(--text-soft);">No achievements yet. Keep playing!</p>';
     }
+
     achievementsOverlay.style.display = "flex";
 }
 
-/* GLOBAL LEADERBOARD */
 function submitRunToGlobalLeaderboard(score, level, pct) {
-    // This would connect to a backend service
-    // For now, just a placeholder
+    // Connect this to your backend later if you want a real global leaderboard.
 }
 
-/* INIT */
 loadProfiles();
 </script>
 </body>
