@@ -23,6 +23,8 @@
 <title>Colour Focus – Perception Test</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<link rel="stylesheet" href="styles/explosion.css">
+
 <style>
     :root {
         --accent: #2563eb;
@@ -562,6 +564,8 @@
     </div>
 </div>
 
+<script defer src="scripts/explosion-and-feedback.js"></script>
+
 <script>
 /* GAME STATE */
 let level = 1;
@@ -998,260 +1002,48 @@ function endSession() {
     resultsBest.textContent = `Best Score: ${bestScore} • Best Level: ${bestLevel}`;
 
     recordWeeklyRun(score, level, pct);
-
     resultsOverlay.style.display = "flex";
 }
 
-/* RANK + LEADERBOARD */
-function getRank(score) {
-    if (score >= 10000) return "MASTER";
-    if (score >= 7000) return "DIAMOND";
-    if (score >= 5000) return "GOLD";
-    if (score >= 3000) return "SILVER";
-    return "BRONZE";
-}
+/* BUTTON HANDLERS */
+startBtn.onclick = () => {
+    startSession();
+    startBtn.style.display = "none";
+    pauseBtn.style.display = "block";
+};
 
-function applyRankPill(rank) {
-    lbRankPill.className = "rank-pill";
-    if (rank === "MASTER") lbRankPill.classList.add("rank-master");
-    else if (rank === "DIAMOND") lbRankPill.classList.add("rank-diamond");
-    else if (rank === "GOLD") lbRankPill.classList.add("rank-gold");
-    else if (rank === "SILVER") lbRankPill.classList.add("rank-silver");
-    else lbRankPill.classList.add("rank-bronze");
-    lbRankPill.textContent = rank;
-}
-
-function formatResetTime() {
-    const now = Date.now();
-    // Next Monday 00:00 UTC
-    const d = new Date();
-    const dayOfWeek = d.getUTCDay();
-    const daysUntilMonday = dayOfWeek === 0 ? 1 : (8 - dayOfWeek) % 7 || 7;
-    const next = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + daysUntilMonday));
-    const diff = Math.max(0, next.getTime() - now);
-
-    const days = Math.floor(diff / (24 * 60 * 60 * 1000));
-    const hours = Math.floor((diff % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
-
-    return `Resets in ${days} day${days !== 1 ? "s" : ""}, ${hours} hour${hours !== 1 ? "s" : ""}`;
-}
-
-/* GLOBAL LEADERBOARD */
-let currentLbTab = "my";
-
-function switchLbTab(tab) {
-    currentLbTab = tab;
-    document.getElementById("lb-tab-my").classList.toggle("active", tab === "my");
-    document.getElementById("lb-tab-global").classList.toggle("active", tab === "global");
-    document.getElementById("lb-panel-my").classList.toggle("active", tab === "my");
-    document.getElementById("lb-panel-global").classList.toggle("active", tab === "global");
-    if (tab === "global") {
-        loadGlobalLeaderboard();
-    }
-}
-
-async function loadGlobalLeaderboard() {
-    const listEl = document.getElementById("lb-global-list");
-    listEl.innerHTML = '<div class="lb-loading">Loading…</div>';
-    try {
-        const res = await fetch("/api/leaderboard");
-        if (!res.ok) throw new Error("Failed to load");
-        const data = await res.json();
-        renderGlobalLeaderboard(data.entries || []);
-    } catch {
-        listEl.innerHTML = '<div class="lb-loading">Could not load global rankings.</div>';
-    }
-}
-
-function renderGlobalLeaderboard(entries) {
-    const listEl = document.getElementById("lb-global-list");
-    listEl.innerHTML = "";
-
-    if (entries.length === 0) {
-        listEl.innerHTML = '<div class="lb-loading">No scores yet this week. Be the first!</div>';
-        return;
-    }
-
-    const myId = currentProfile.id;
-
-    entries.forEach((entry, i) => {
-        const rank = i + 1;
-        const row = document.createElement("div");
-        row.className = "lb-global-row";
-
-        const rankEl = document.createElement("span");
-        rankEl.className = "lb-global-rank";
-        if (rank === 1) { rankEl.textContent = "🥇"; rankEl.classList.add("top1"); }
-        else if (rank === 2) { rankEl.textContent = "🥈"; rankEl.classList.add("top2"); }
-        else if (rank === 3) { rankEl.textContent = "🥉"; rankEl.classList.add("top3"); }
-        else rankEl.textContent = `#${rank}`;
-
-        const nameEl = document.createElement("span");
-        nameEl.className = "lb-global-name";
-        if (entry.playerId === myId) nameEl.classList.add("me");
-        nameEl.textContent = entry.username;
-
-        const scoreEl = document.createElement("span");
-        scoreEl.className = "lb-global-score";
-        scoreEl.textContent = entry.bestScore.toLocaleString();
-
-        const levelEl = document.createElement("span");
-        levelEl.className = "lb-global-level";
-        levelEl.textContent = `L${entry.bestLevel}`;
-
-        row.appendChild(rankEl);
-        row.appendChild(nameEl);
-        row.appendChild(scoreEl);
-        row.appendChild(levelEl);
-        listEl.appendChild(row);
-    });
-}
-
-async function submitRunToGlobalLeaderboard(score, level, accuracy) {
-    try {
-        await fetch("/api/leaderboard", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                playerId: currentProfile.id,
-                username: currentProfile.username,
-                score,
-                level,
-                accuracy,
-            }),
-        });
-    } catch {
-        // Non-blocking — local data is still saved
-    }
-}
-
-function renderLeaderboard() {
-    const w = currentProfile.weekly;
-    const rank = getRank(w.bestScore || 0);
-    applyRankPill(rank);
-
-    lbBest.textContent = `Weekly best: ${w.bestScore} pts • Level ${w.bestLevel}`;
-    lbReset.textContent = formatResetTime();
-    lbUsername.textContent = `Current name: ${currentProfile.username}`;
-
-    lbRuns.innerHTML = "";
-    if (!w.runs || w.runs.length === 0) {
-        lbRuns.textContent = "No runs yet this week. Play a game to start filling this in.";
-        return;
-    }
-
-    const maxScore = Math.max(...w.runs.map(r => r.score), 1);
-
-    w.runs.forEach((run, idx) => {
-        const row = document.createElement("div");
-        row.className = "lb-run-row";
-
-        const label = document.createElement("div");
-        label.className = "lb-run-label";
-        const runIndex = w.runs.length - idx;
-        label.innerHTML = `<span>Run ${runIndex}</span><span>${run.name || "Player"} • ${run.score} pts • L${run.level} • ${run.accuracy}%</span>`;
-
-        const barOuter = document.createElement("div");
-        barOuter.className = "lb-bar-outer";
-
-        const barInner = document.createElement("div");
-        barInner.className = "lb-bar-inner";
-        const width = Math.max(5, (run.score / maxScore) * 100);
-        barInner.style.width = width + "%";
-
-        let color = "#f97373";
-        if (run.accuracy >= 80) color = "#22c55e";
-        else if (run.accuracy >= 60) color = "#eab308";
-        barInner.style.background = color;
-
-        barOuter.appendChild(barInner);
-        row.appendChild(label);
-        row.appendChild(barOuter);
-        lbRuns.appendChild(row);
-    });
-}
-
-/* ACHIEVEMENTS */
-function formatWeekLabel(weekStart) {
-    const d = new Date(weekStart);
-    const options = { day: "numeric", month: "long", year: "numeric" };
-    return "Week of " + d.toLocaleDateString(undefined, options);
-}
-
-function renderAchievements() {
-    achListEl.innerHTML = "";
-    const ach = currentProfile.achievements || [];
-    if (ach.length === 0) {
-        achListEl.textContent = "No medals yet. Place in the top 3 of a week to earn one.";
-        return;
-    }
-
-    ach.slice().reverse().forEach(entry => {
-        const card = document.createElement("div");
-        card.className = "medal-card";
-        let icon = "🥉";
-        let label = "BRONZE MEDAL";
-        card.classList.add("medal-bronze");
-        if (entry.medal === "gold") {
-            icon = "🥇";
-            label = "GOLD MEDAL";
-            card.classList.remove("medal-bronze");
-            card.classList.add("medal-gold");
-        } else if (entry.medal === "silver") {
-            icon = "🥈";
-            label = "SILVER MEDAL";
-            card.classList.remove("medal-bronze");
-            card.classList.add("medal-silver");
-        }
-
-        const title = document.createElement("div");
-        title.className = "medal-title";
-        title.textContent = `${icon} ${label}`;
-
-        const date = document.createElement("div");
-        date.className = "medal-date";
-        date.textContent = formatWeekLabel(entry.weekStart);
-
-        card.appendChild(title);
-        card.appendChild(date);
-        achListEl.appendChild(card);
-    });
-}
-
-/* NAME HANDLING */
-function setUsername(newName) {
-    const trimmed = newName.trim();
-    if (trimmed.length === 0) return;
-    currentProfile.username = trimmed;
-    saveProfiles();
-}
-
-/* PAUSE / CONTROLS */
-function pauseGame() {
-    if (!gameActive || paused) return;
+pauseBtn.onclick = () => {
+    if (!gameActive) return;
     paused = true;
     pauseOverlay.style.display = "flex";
-}
+};
 
-function continueGame() {
-    if (!paused) return;
+continueBtn.onclick = () => {
     paused = false;
     pauseOverlay.style.display = "none";
-}
+};
 
-/* BUTTONS */
-startBtn.onclick = startSession;
-restartBtn.onclick = () => { gameActive = false; startSession(); };
-pauseBtn.onclick = pauseGame;
-continueBtn.onclick = continueGame;
-playAgainBtn.onclick = startSession;
+restartBtn.onclick = () => {
+    if (gameActive) {
+        gameActive = false;
+        clearInterval(sessionTimer);
+    }
+    startBtn.style.display = "block";
+    pauseBtn.style.display = "none";
+    resultsOverlay.style.display = "none";
+    pauseOverlay.style.display = "none";
+    gridEl.innerHTML = "";
+};
+
+playAgainBtn.onclick = () => {
+    resultsOverlay.style.display = "none";
+    startSession();
+};
 
 leaderboardBtn.onclick = () => {
-    initWeeklyForCurrentProfile();
-    switchLbTab("my");
-    renderLeaderboard();
-    leaderboardOverlay.style.display = "flex";
+    showLeaderboardOverlay();
 };
+
 lbCloseBtn.onclick = () => {
     leaderboardOverlay.style.display = "none";
 };
@@ -1260,102 +1052,201 @@ lbNameBtn.onclick = () => {
     nameInput.value = currentProfile.username || "";
     nameOverlay.style.display = "flex";
 };
+
 nameSaveBtn.onclick = () => {
-    const val = nameInput.value;
-    if (val.trim().length > 0) {
-        setUsername(val);
+    const name = nameInput.value.trim();
+    if (name) {
+        currentProfile.username = name;
+        saveProfiles();
     }
     nameOverlay.style.display = "none";
+    lbUsername.textContent = `You: ${currentProfile.username}`;
 };
 
-nameOverlay.addEventListener("click", (e) => {
-    if (e.target === nameOverlay) {
-        nameOverlay.style.display = "none";
-    }
-});
-
-/* PROFILE BUTTONS */
 lbProfileBtn.onclick = () => {
     showProfileOverlay();
 };
-addProfileBtn.onclick = () => {
-    const count = Object.keys(profilesData.profiles).length;
-    if (count >= 3) return;
-    const p = createNewProfile();
-    profilesData.profiles[p.id] = p;
-    setActiveProfile(p.id);
-    renderProfileList();
-};
+
 profileCloseBtn.onclick = () => {
     hideProfileOverlay();
 };
-profileOverlay.addEventListener("click", (e) => {
-    if (e.target === profileOverlay) hideProfileOverlay();
-});
 
-/* ACHIEVEMENTS BUTTONS */
-achievementsBtn.onclick = () => {
-    renderAchievements();
-    achievementsOverlay.style.display = "flex";
+addProfileBtn.onclick = () => {
+    const newProf = createNewProfile();
+    profilesData.profiles[newProf.id] = newProf;
+    profilesData.activeId = newProf.id;
+    currentProfile = newProf;
+    saveProfiles();
+    applyProfileToUI();
+    renderProfileList();
 };
+
+achievementsBtn.onclick = () => {
+    showAchievementsOverlay();
+};
+
 achCloseBtn.onclick = () => {
     achievementsOverlay.style.display = "none";
 };
-achievementsOverlay.addEventListener("click", (e) => {
-    if (e.target === achievementsOverlay) achievementsOverlay.style.display = "none";
-});
+
+/* LEADERBOARD */
+function showLeaderboardOverlay() {
+    leaderboardOverlay.style.display = "flex";
+    const w = currentProfile.weekly;
+    lbBest.textContent = `Best this week: ${w && w.bestScore ? w.bestScore : 0}`;
+    lbReset.textContent = `Resets: ${w ? formatWeeklyReset(w.weekStart) : "soon"}`;
+    lbUsername.textContent = `You: ${currentProfile.username}`;
+    renderLbRuns();
+    loadGlobalLeaderboard();
+}
+
+function formatWeeklyReset(weekStartMs) {
+    const resetDay = new Date(weekStartMs);
+    resetDay.setDate(resetDay.getDate() + 7);
+    const now = new Date();
+    const daysLeft = Math.ceil((resetDay - now) / (1000 * 60 * 60 * 24));
+    return `${daysLeft} day${daysLeft !== 1 ? "s" : ""} left`;
+}
+
+function renderLbRuns() {
+    const w = currentProfile.weekly;
+    lbRuns.innerHTML = "";
+    if (!w || !w.runs || w.runs.length === 0) {
+        lbRuns.innerHTML = "<p style='font-size:12px;color:var(--text-soft)'>No runs yet this week</p>";
+        return;
+    }
+    w.runs.forEach(run => {
+        const div = document.createElement("div");
+        div.className = "lb-run-row";
+        const label = document.createElement("div");
+        label.className = "lb-run-label";
+        label.innerHTML = `<span>${run.date} L${run.level}</span><span>${run.score}</span>`;
+        const bar = document.createElement("div");
+        bar.className = "lb-bar-outer";
+        const inner = document.createElement("div");
+        inner.className = "lb-bar-inner";
+        inner.style.width = `${run.accuracy}%`;
+        inner.style.background = run.accuracy >= 80 ? "#22c55e" : run.accuracy >= 50 ? "#eab308" : "#ef4444";
+        bar.appendChild(inner);
+        div.appendChild(label);
+        div.appendChild(bar);
+        lbRuns.appendChild(div);
+    });
+}
+
+function switchLbTab(tab) {
+    const myTab = document.getElementById("lb-tab-my");
+    const globalTab = document.getElementById("lb-tab-global");
+    const myPanel = document.getElementById("lb-panel-my");
+    const globalPanel = document.getElementById("lb-panel-global");
+
+    if (tab === "my") {
+        myTab.classList.add("active");
+        globalTab.classList.remove("active");
+        myPanel.classList.add("active");
+        globalPanel.classList.remove("active");
+    } else {
+        myTab.classList.remove("active");
+        globalTab.classList.add("active");
+        myPanel.classList.remove("active");
+        globalPanel.classList.add("active");
+        loadGlobalLeaderboard();
+    }
+}
+
+function loadGlobalLeaderboard() {
+    const lbGlobalList = document.getElementById("lb-global-list");
+    lbGlobalList.innerHTML = '<div class="lb-loading">Loading…</div>';
+
+    const url = new URL("https://script.google.com/macros/d/1czHOlx2Jh0i3bKc0z-4l51gxvjlwYxJ_IjzEWc1YAz4PfHPOjL6pKu-A/usercontent");
+    const weekStartMs = currentProfile.weekly.weekStart;
+
+    fetch(url.toString() + `?weekStart=${weekStartMs}`)
+        .then(r => r.json())
+        .catch(() => [])
+        .then(data => {
+            if (!Array.isArray(data) || data.length === 0) {
+                lbGlobalList.innerHTML = '<div class="lb-loading">No data yet</div>';
+                return;
+            }
+            lbGlobalList.innerHTML = "";
+            data.forEach((row, idx) => {
+                const div = document.createElement("div");
+                div.className = "lb-global-row";
+
+                const rank = document.createElement("div");
+                rank.className = "lb-global-rank";
+                if (idx === 0) rank.classList.add("top1");
+                else if (idx === 1) rank.classList.add("top2");
+                else if (idx === 2) rank.classList.add("top3");
+                rank.textContent = `#${idx + 1}`;
+
+                const name = document.createElement("div");
+                name.className = "lb-global-name";
+                if (row.username === currentProfile.username) {
+                    name.classList.add("me");
+                }
+                name.textContent = row.username || "Anonymous";
+
+                const score = document.createElement("div");
+                score.className = "lb-global-score";
+                score.textContent = row.score || 0;
+
+                const level = document.createElement("div");
+                level.className = "lb-global-level";
+                level.textContent = `L${row.level || 1}`;
+
+                div.appendChild(rank);
+                div.appendChild(name);
+                div.appendChild(score);
+                div.appendChild(level);
+                lbGlobalList.appendChild(div);
+            });
+        });
+}
+
+function submitRunToGlobalLeaderboard(score, level, pct) {
+    const url = "https://script.google.com/macros/d/1czHOlx2Jh0i3bKc0z-4l51gxvjlwYxJ_IjzEWc1YAz4PfHPOjL6pKu-A/usercontent";
+    const payload = {
+        action: "submit",
+        username: currentProfile.username,
+        score,
+        level,
+        accuracy: pct,
+        weekStart: currentProfile.weekly.weekStart
+    };
+    fetch(url, {
+        method: "POST",
+        body: JSON.stringify(payload)
+    }).catch(() => {});
+}
+
+function showAchievementsOverlay() {
+    achievementsOverlay.style.display = "flex";
+    achListEl.innerHTML = "";
+    if (!currentProfile.achievements || currentProfile.achievements.length === 0) {
+        achListEl.innerHTML = "<p style='font-size:13px;color:var(--text-soft);text-align:center;margin:10px 0'>No achievements yet. Get into the top 3 of a week!</p>";
+        return;
+    }
+    currentProfile.achievements.forEach(ach => {
+        const card = document.createElement("div");
+        card.className = `medal-card medal-${ach.medal}`;
+        const title = document.createElement("div");
+        title.className = "medal-title";
+        const icon = ach.medal === "gold" ? "🥇" : ach.medal === "silver" ? "🥈" : "🥉";
+        title.textContent = `${icon} ${ach.medal.toUpperCase()}`;
+        const date = document.createElement("div");
+        date.className = "medal-date";
+        const d = new Date(ach.weekStart);
+        date.textContent = `Week of ${d.toLocaleDateString()}`;
+        card.appendChild(title);
+        card.appendChild(date);
+        achListEl.appendChild(card);
+    });
+}
 
 /* INIT */
 loadProfiles();
-// Start analytics on first meaningful interaction (click, key, or touch)
-(function() {
-  if (window._eyeGameSessionStarted) return;
-  function onFirstInteraction() {
-    if (!window._eyeGameSessionStarted && window.EyeGameAnalytics && typeof EyeGameAnalytics.sessionStart === 'function') {
-      EyeGameAnalytics.sessionStart();
-      window._eyeGameSessionStarted = true;
-      if (window.GA_DEBUG) console.info('EyeGameAnalytics: session_start sent (first interaction)');
-    }
-    window.removeEventListener('click', onFirstInteraction);
-    window.removeEventListener('keydown', onFirstInteraction);
-    window.removeEventListener('touchstart', onFirstInteraction);
-  }
-  window.addEventListener('click', onFirstInteraction, { once: true });
-  window.addEventListener('keydown', onFirstInteraction, { once: true });
-  window.addEventListener('touchstart', onFirstInteraction, { once: true });
-})();
-/* If more than one profile exists, show selector on startup */
-if (Object.keys(profilesData.profiles).length > 1) {
-    showProfileOverlay();
-}
-</script>
-    
-<script>
-/* Simple analytics wrapper for Eye Game */
-window.EyeGameAnalytics = (function(){
-  function sendEvent(name, params) {
-    try {
-      if (typeof gtag === 'function') {
-        gtag('event', name, params || {});
-      }
-      if (window.GA_DEBUG) {
-        console.info('[GA EVENT]', name, params || {});
-      }
-    } catch (e) {
-      console.warn('GA send failed', e);
-    }
-  }
-
-  return {
-    sessionStart: function() { sendEvent('session_start'); },
-    levelStart: function(level) { sendEvent('level_start', { level: Number(level) || 0 }); },
-    levelComplete: function(level, score) { sendEvent('level_complete', { level: Number(level) || 0, score: Number(score) || 0 }); },
-    gameOver: function(score, reason) { sendEvent('game_over', { score: Number(score) || 0, reason: String(reason || '') }); },
-    rewardOptIn: function(rewardName) { sendEvent('reward_opt_in', { reward: String(rewardName || '') }); },
-    storeOpen: function() { sendEvent('store_open'); },
-    purchase: function(itemId, price, currency) { sendEvent('purchase', { item: String(itemId || ''), price: Number(price) || 0, currency: String(currency || 'USD') }); }
-  };
-})();
 </script>
 </body>
 </html>
