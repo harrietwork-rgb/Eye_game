@@ -997,3 +997,227 @@ function startSession() {
 
     gameActive = true;
     paused = false;
+
+    level = 1;
+    score = 0;
+    correct = 0;
+    wrong = 0;
+    lives = 3;
+    lastClickTime = performance.now();
+
+    updateLives();
+    updateAccuracy();
+    createPuzzle();
+
+    sessionRemaining = sessionSeconds;
+    updateTimer();
+
+    startBtn.style.display = "none";
+    pauseBtn.style.display = "inline-block";
+    restartBtn.style.display = "inline-block";
+    leaderboardBtn.style.display = "none";
+    achievementsBtn.style.display = "none";
+
+    sessionTimer = setInterval(() => {
+        if (!paused) {
+            sessionRemaining--;
+            updateTimer();
+            if (sessionRemaining <= 0) {
+                clearInterval(sessionTimer);
+                endSession();
+            }
+        }
+    }, 1000);
+}
+
+function endSession() {
+    gameActive = false;
+    clearInterval(sessionTimer);
+    
+    const total = correct + wrong;
+    const pct = total === 0 ? 0 : Math.round((correct / total) * 100);
+
+    recordWeeklyRun(score, level, pct);
+
+    // Trigger explosion animation on tiles before showing results
+    if (window.explodeAllThenShowStats) {
+        window.explodeAllThenShowStats(() => {
+            // This callback runs after explosion completes
+            resultsScore.textContent = `Score: ${score}`;
+            resultsAccuracy.textContent = `Accuracy: ${pct}% (${correct}/${total})`;
+            resultsLevel.textContent = `Level Reached: ${level}`;
+            resultsBest.textContent = `Best Score: ${bestScore}`;
+
+            resultsOverlay.style.display = "flex";
+
+            startBtn.style.display = "inline-block";
+            pauseBtn.style.display = "none";
+            restartBtn.style.display = "none";
+            leaderboardBtn.style.display = "inline-block";
+            achievementsBtn.style.display = "inline-block";
+        }, {
+            selector: '.tile',
+            duration: 600,
+            distance: 300,
+            popBefore: true
+        });
+    } else {
+        // Fallback if explosion helper isn't loaded
+        resultsScore.textContent = `Score: ${score}`;
+        resultsAccuracy.textContent = `Accuracy: ${pct}% (${correct}/${total})`;
+        resultsLevel.textContent = `Level Reached: ${level}`;
+        resultsBest.textContent = `Best Score: ${bestScore}`;
+
+        resultsOverlay.style.display = "flex";
+
+        startBtn.style.display = "inline-block";
+        pauseBtn.style.display = "none";
+        restartBtn.style.display = "none";
+        leaderboardBtn.style.display = "inline-block";
+        achievementsBtn.style.display = "inline-block";
+    }
+}
+
+/* EVENT LISTENERS */
+startBtn.onclick = startSession;
+restartBtn.onclick = startSession;
+pauseBtn.onclick = () => {
+    paused = true;
+    pauseOverlay.style.display = "flex";
+};
+continueBtn.onclick = () => {
+    paused = false;
+    pauseOverlay.style.display = "none";
+};
+playAgainBtn.onclick = startSession;
+lbCloseBtn.onclick = () => {
+    leaderboardOverlay.style.display = "none";
+};
+leaderboardBtn.onclick = () => {
+    showLeaderboard();
+};
+achievementsBtn.onclick = () => {
+    showAchievements();
+};
+lbNameBtn.onclick = () => {
+    leaderboardOverlay.style.display = "none";
+    nameInput.value = currentProfile.username;
+    nameOverlay.style.display = "flex";
+};
+lbProfileBtn.onclick = () => {
+    leaderboardOverlay.style.display = "none";
+    showProfileOverlay();
+};
+profileCloseBtn.onclick = hideProfileOverlay;
+achCloseBtn.onclick = () => {
+    achievementsOverlay.style.display = "none";
+};
+nameSaveBtn.onclick = () => {
+    const newName = nameInput.value.trim();
+    if (newName.length > 0) {
+        currentProfile.username = newName;
+        saveProfiles();
+        nameOverlay.style.display = "none";
+    }
+};
+
+/* LEADERBOARD */
+function switchLbTab(tab) {
+    const myPanel = document.getElementById("lb-panel-my");
+    const globalPanel = document.getElementById("lb-panel-global");
+    const myTab = document.getElementById("lb-tab-my");
+    const globalTab = document.getElementById("lb-tab-global");
+
+    if (tab === "my") {
+        myPanel.classList.add("active");
+        globalPanel.classList.remove("active");
+        myTab.classList.add("active");
+        globalTab.classList.remove("active");
+    } else {
+        myPanel.classList.remove("active");
+        globalPanel.classList.add("active");
+        myTab.classList.remove("active");
+        globalTab.classList.add("active");
+    }
+}
+
+function showLeaderboard() {
+    const w = currentProfile.weekly;
+    
+    // Rank pill
+    if (w && w.runs && w.runs.length >= 3) {
+        const medals = w.runs.slice(0, 3).length;
+        if (medals >= 3) {
+            lbRankPill.textContent = "MASTER";
+            lbRankPill.className = "rank-pill rank-master";
+        } else {
+            lbRankPill.textContent = "GOLD";
+            lbRankPill.className = "rank-pill rank-gold";
+        }
+    } else {
+        lbRankPill.textContent = "BRONZE";
+        lbRankPill.className = "rank-pill rank-bronze";
+    }
+
+    // Best score
+    lbBest.textContent = `Best this week: ${w ? w.bestScore : 0}`;
+
+    // Reset date
+    const nextMonday = new Date(getCurrentWeekStartMs() + 7 * 24 * 60 * 60 * 1000);
+    const resetDate = nextMonday.toLocaleDateString();
+    lbReset.textContent = `Resets: ${resetDate}`;
+
+    // Username
+    lbUsername.textContent = `Name: ${currentProfile.username}`;
+
+    // Runs
+    lbRuns.innerHTML = "";
+    if (w && w.runs) {
+        const sorted = [...w.runs].sort((a, b) => b.score - a.score);
+        sorted.forEach(run => {
+            const div = document.createElement("div");
+            div.className = "lb-run-row";
+            div.innerHTML = `
+                <div class="lb-run-label">
+                    <span>Score: ${run.score}</span>
+                    <span>Accuracy: ${run.accuracy}%</span>
+                </div>
+            `;
+            lbRuns.appendChild(div);
+        });
+    }
+
+    leaderboardOverlay.style.display = "flex";
+}
+
+function showAchievements() {
+    achListEl.innerHTML = "";
+    if (currentProfile.achievements && currentProfile.achievements.length > 0) {
+        currentProfile.achievements.forEach((ach, idx) => {
+            const medalClass = `medal-${ach.medal}`;
+            const medalEmoji = ach.medal === "gold" ? "🥇" : ach.medal === "silver" ? "🥈" : "🥉";
+            const div = document.createElement("div");
+            div.className = `medal-card ${medalClass}`;
+            div.innerHTML = `
+                <div class="medal-title">${medalEmoji} ${ach.medal.toUpperCase()}</div>
+                <div class="medal-date">Week of ${new Date(ach.weekStart).toLocaleDateString()}</div>
+            `;
+            achListEl.appendChild(div);
+        });
+    } else {
+        achListEl.innerHTML = '<p style="color: var(--text-soft);">No achievements yet. Keep playing!</p>';
+    }
+    achievementsOverlay.style.display = "flex";
+}
+
+/* GLOBAL LEADERBOARD */
+function submitRunToGlobalLeaderboard(score, level, pct) {
+    // This would connect to a backend service
+    // For now, just a placeholder
+}
+
+/* INIT */
+loadProfiles();
+</script>
+</body>
+</html>
