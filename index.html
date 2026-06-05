@@ -1,6 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Google tag gtag.js -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-NFRD369Q9E"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // Configure GA4 measurement
+  gtag('config', 'G-NFRD369Q9E', { send_page_view: true });
+
+  // Debug helper: set to false for production
+  window.GA_DEBUG = true;
+  if (window.GA_DEBUG) {
+    gtag('set', {'debug_mode': true});
+    console.info('[GA] Debug mode enabled');
+  }
+</script>
+    
 <meta charset="UTF-8">
 <title>Colour Focus – Perception Test</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1289,11 +1307,55 @@ achievementsOverlay.addEventListener("click", (e) => {
 
 /* INIT */
 loadProfiles();
-
+// Start analytics on first meaningful interaction (click, key, or touch)
+(function() {
+  if (window._eyeGameSessionStarted) return;
+  function onFirstInteraction() {
+    if (!window._eyeGameSessionStarted && window.EyeGameAnalytics && typeof EyeGameAnalytics.sessionStart === 'function') {
+      EyeGameAnalytics.sessionStart();
+      window._eyeGameSessionStarted = true;
+      if (window.GA_DEBUG) console.info('EyeGameAnalytics: session_start sent (first interaction)');
+    }
+    window.removeEventListener('click', onFirstInteraction);
+    window.removeEventListener('keydown', onFirstInteraction);
+    window.removeEventListener('touchstart', onFirstInteraction);
+  }
+  window.addEventListener('click', onFirstInteraction, { once: true });
+  window.addEventListener('keydown', onFirstInteraction, { once: true });
+  window.addEventListener('touchstart', onFirstInteraction, { once: true });
+})();
 /* If more than one profile exists, show selector on startup */
 if (Object.keys(profilesData.profiles).length > 1) {
     showProfileOverlay();
 }
+</script>
+    
+<script>
+/* Simple analytics wrapper for Eye Game */
+window.EyeGameAnalytics = (function(){
+  function sendEvent(name, params) {
+    try {
+      if (typeof gtag === 'function') {
+        gtag('event', name, params || {});
+      }
+      if (window.GA_DEBUG) {
+        console.info('[GA EVENT]', name, params || {});
+      }
+    } catch (e) {
+      console.warn('GA send failed', e);
+    }
+  }
+
+  return {
+    sessionStart: function() { sendEvent('session_start'); },
+    levelStart: function(level) { sendEvent('level_start', { level: Number(level) || 0 }); },
+    levelComplete: function(level, score) { sendEvent('level_complete', { level: Number(level) || 0, score: Number(score) || 0 }); },
+    gameOver: function(score, reason) { sendEvent('game_over', { score: Number(score) || 0, reason: String(reason || '') }); },
+    rewardOptIn: function(rewardName) { sendEvent('reward_opt_in', { reward: String(rewardName || '') }); },
+    storeOpen: function() { sendEvent('store_open'); },
+    purchase: function(itemId, price, currency) { sendEvent('purchase', { item: String(itemId || ''), price: Number(price) || 0, currency: String(currency || 'USD') }); }
+  };
+})();
 </script>
 </body>
 </html>
