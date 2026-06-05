@@ -164,13 +164,6 @@
         border-radius: 8px;
         cursor: pointer;
         border: 1px solid var(--border);
-        transition: border 0.3s, box-shadow 0.3s;
-    }
-
-    /* Highlight wrong answer feedback */
-    .tile.wrong-answer-feedback {
-        border: 3px solid #ef4444 !important;
-        box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
     }
 
     .controls {
@@ -930,51 +923,68 @@ function onTileClick(e) {
     if (isCorrect) {
         correct++;
         addScoreForCorrectClick();
+        updateAccuracy();
+
+        level++;
+        if (level > bestLevel) {
+            bestLevel = level;
+            bestLevelValueEl.textContent = bestLevel;
+            currentProfile.bestLevel = bestLevel;
+            saveProfiles();
+        }
+
+        createPuzzle();
     } else {
         wrong++;
         lives--;
         updateLives();
+        updateAccuracy();
         
-        // Highlight the correct tile with red border
+        // Show red highlight on correct tile, then glimpse it in green
         const correctTile = gridEl.children[oddIndex];
         if (correctTile) {
             correctTile.classList.add('wrong-answer-feedback');
-        }
-        
-        // Show feedback for 600ms then move to next puzzle or end game
-        setTimeout(() => {
-            if (correctTile) {
+            
+            // After 300ms, remove red and show green glimpse
+            setTimeout(() => {
                 correctTile.classList.remove('wrong-answer-feedback');
-            }
-            if (lives <= 0) {
-                endSession();
-            } else {
-                level++;
-                if (level > bestLevel) {
-                    bestLevel = level;
-                    bestLevelValueEl.textContent = bestLevel;
-                    currentProfile.bestLevel = bestLevel;
-                    saveProfiles();
+                
+                // Show correct tile with green highlight using the helper
+                if (window.glimpseCorrectThenContinue) {
+                    window.glimpseCorrectThenContinue(correctTile, () => {
+                        if (lives <= 0) {
+                            endSession();
+                        } else {
+                            level++;
+                            if (level > bestLevel) {
+                                bestLevel = level;
+                                bestLevelValueEl.textContent = bestLevel;
+                                currentProfile.bestLevel = bestLevel;
+                                saveProfiles();
+                            }
+                            createPuzzle();
+                        }
+                    }, { glimpseMs: 300 });
+                } else {
+                    // Fallback if helper isn't loaded
+                    setTimeout(() => {
+                        if (lives <= 0) {
+                            endSession();
+                        } else {
+                            level++;
+                            if (level > bestLevel) {
+                                bestLevel = level;
+                                bestLevelValueEl.textContent = bestLevel;
+                                currentProfile.bestLevel = bestLevel;
+                                saveProfiles();
+                            }
+                            createPuzzle();
+                        }
+                    }, 300);
                 }
-                createPuzzle();
-            }
-        }, 600);
-        
-        updateAccuracy();
-        return;
+            }, 300);
+        }
     }
-
-    updateAccuracy();
-
-    level++;
-    if (level > bestLevel) {
-        bestLevel = level;
-        bestLevelValueEl.textContent = bestLevel;
-        currentProfile.bestLevel = bestLevel;
-        saveProfiles();
-    }
-
-    createPuzzle();
 }
 
 /* TIMER + SESSION */
@@ -997,276 +1007,244 @@ function startSession() {
 
     updateLives();
     updateAccuracy();
+    createPuzzle();
 
     sessionRemaining = sessionSeconds;
     updateTimer();
-    scoreValueEl.textContent = "0";
 
-    resultsOverlay.style.display = "none";
+    startBtn.style.display = "none";
+    pauseBtn.style.display = "inline-block";
+    restartBtn.style.display = "inline-block";
+    leaderboardBtn.style.display = "none";
+    achievementsBtn.style.display = "none";
 
-    if (sessionTimer) clearInterval(sessionTimer);
     sessionTimer = setInterval(() => {
         if (!paused) {
             sessionRemaining--;
             updateTimer();
             if (sessionRemaining <= 0) {
+                clearInterval(sessionTimer);
                 endSession();
             }
         }
     }, 1000);
-
-    createPuzzle();
 }
 
 function endSession() {
-    if (!gameActive) return;
     gameActive = false;
     clearInterval(sessionTimer);
-
+    
     const total = correct + wrong;
     const pct = total === 0 ? 0 : Math.round((correct / total) * 100);
 
-    resultsScore.textContent = `Score: ${score}`;
-    resultsAccuracy.textContent = `Accuracy: ${pct}% (${correct} / ${total})`;
-    resultsLevel.textContent = `Level reached: ${level}`;
-    resultsBest.textContent = `Best score: ${bestScore}`;
-
     recordWeeklyRun(score, level, pct);
-    renderLeaderboard();
+
+    resultsScore.textContent = `Score: ${score}`;
+    resultsAccuracy.textContent = `Accuracy: ${pct}% (${correct}/${total})`;
+    resultsLevel.textContent = `Level Reached: ${level}`;
+    resultsBest.textContent = `Best Score: ${bestScore}`;
 
     resultsOverlay.style.display = "flex";
+
+    startBtn.style.display = "inline-block";
+    pauseBtn.style.display = "none";
+    restartBtn.style.display = "none";
+    leaderboardBtn.style.display = "inline-block";
+    achievementsBtn.style.display = "inline-block";
 }
 
 /* EVENT LISTENERS */
-startBtn.onclick = () => {
-    startBtn.style.display = "none";
-    pauseBtn.style.display = "inline-block";
-    restartBtn.style.display = "inline-block";
-    startSession();
-};
-
+startBtn.onclick = startSession;
 pauseBtn.onclick = () => {
-    if (!gameActive) return;
     paused = true;
     pauseOverlay.style.display = "flex";
 };
-
 continueBtn.onclick = () => {
     paused = false;
     pauseOverlay.style.display = "none";
 };
-
 restartBtn.onclick = () => {
     gameActive = false;
     clearInterval(sessionTimer);
-    startBtn.style.display = "inline-block";
-    pauseBtn.style.display = "none";
-    restartBtn.style.display = "none";
-    resultsOverlay.style.display = "none";
-    level = 1;
-    score = 0;
-    correct = 0;
-    wrong = 0;
-    lives = 3;
-    updateLives();
-    updateAccuracy();
-    scoreValueEl.textContent = "0";
-    sessionRemaining = sessionSeconds;
-    updateTimer();
-    gridEl.innerHTML = "";
-};
-
-playAgainBtn.onclick = () => {
-    startBtn.style.display = "none";
-    pauseBtn.style.display = "inline-block";
-    restartBtn.style.display = "inline-block";
     startSession();
 };
-
-leaderboardBtn.onclick = () => {
-    renderLeaderboard();
-    leaderboardOverlay.style.display = "flex";
+playAgainBtn.onclick = () => {
+    resultsOverlay.style.display = "none";
+    startSession();
 };
-
+leaderboardBtn.onclick = () => {
+    showLeaderboard();
+};
 lbCloseBtn.onclick = () => {
     leaderboardOverlay.style.display = "none";
 };
-
-achievementsBtn.onclick = () => {
-    renderAchievements();
-    achievementsOverlay.style.display = "flex";
-};
-
-achCloseBtn.onclick = () => {
-    achievementsOverlay.style.display = "none";
-};
-
 lbNameBtn.onclick = () => {
+    leaderboardOverlay.style.display = "none";
     nameInput.value = currentProfile.username;
     nameOverlay.style.display = "flex";
 };
-
-nameSaveBtn.onclick = () => {
-    const newName = nameInput.value.trim();
-    if (newName.length > 0) {
-        currentProfile.username = newName;
-        saveProfiles();
-        lbUsername.textContent = `Playing as: ${currentProfile.username}`;
-        nameOverlay.style.display = "none";
-    }
-};
-
 lbProfileBtn.onclick = () => {
-    showProfileOverlay();
     leaderboardOverlay.style.display = "none";
+    showProfileOverlay();
 };
-
+nameSaveBtn.onclick = () => {
+    const name = nameInput.value.trim();
+    if (name) {
+        currentProfile.username = name;
+        saveProfiles();
+    }
+    nameOverlay.style.display = "none";
+    showLeaderboard();
+};
 profileCloseBtn.onclick = () => {
     hideProfileOverlay();
-    leaderboardOverlay.style.display = "flex";
+    showLeaderboard();
 };
-
+achievementsBtn.onclick = () => {
+    showAchievements();
+};
+achCloseBtn.onclick = () => {
+    achievementsOverlay.style.display = "none";
+};
 addProfileBtn.onclick = () => {
-    const newProfile = createNewProfile();
-    profilesData.profiles[newProfile.id] = newProfile;
-    profilesData.activeId = newProfile.id;
-    currentProfile = newProfile;
+    const profile = createNewProfile();
+    profilesData.profiles[profile.id] = profile;
+    profilesData.activeId = profile.id;
+    currentProfile = profile;
     saveProfiles();
     applyProfileToUI();
-    initWeeklyForCurrentProfile();
     renderProfileList();
 };
 
-/* LEADERBOARD */
-function renderLeaderboard() {
+/* LEADERBOARD & ACHIEVEMENTS */
+function showLeaderboard() {
     const w = currentProfile.weekly;
     if (!w) return;
 
-    lbBest.textContent = `Best this week: ${w.bestScore}`;
-    lbReset.textContent = `Resets in: ${formatRemainingWeek()}`;
+    const bestScoreThisWeek = w.bestScore || 0;
+    const bestLevelThisWeek = w.bestLevel || 1;
+
+    lbBest.textContent = `Best this week: ${bestScoreThisWeek} (Level ${bestLevelThisWeek})`;
     lbUsername.textContent = `Playing as: ${currentProfile.username}`;
 
-    const rank = getRankForScore(w.bestScore);
-    lbRankPill.className = `rank-pill rank-${rank}`;
+    const rank = getRankForScore(bestScoreThisWeek);
+    lbRankPill.className = `rank-pill rank-${rank.toLowerCase()}`;
     lbRankPill.textContent = rank.toUpperCase();
 
     renderWeeklyRuns();
-    renderGlobalLeaderboard();
+    loadGlobalLeaderboard();
+
+    leaderboardOverlay.style.display = "flex";
 }
 
 function getRankForScore(score) {
-    if (score >= 5000) return "master";
-    if (score >= 3000) return "diamond";
-    if (score >= 1500) return "gold";
-    if (score >= 500) return "silver";
+    if (score >= 500) return "master";
+    if (score >= 400) return "diamond";
+    if (score >= 300) return "gold";
+    if (score >= 150) return "silver";
     return "bronze";
 }
 
-function formatRemainingWeek() {
-    const weekStart = currentProfile.weekly.weekStart;
-    const nextWeekStart = weekStart + 7 * 24 * 60 * 60 * 1000;
-    const now = Date.now();
-    const remaining = Math.max(0, nextWeekStart - now);
-    const days = Math.floor(remaining / (24 * 60 * 60 * 1000));
-    return `${days} day${days !== 1 ? 's' : ''}`;
-}
-
 function renderWeeklyRuns() {
-    const runs = currentProfile.weekly.runs || [];
-    lbRuns.innerHTML = "";
-    if (runs.length === 0) {
-        lbRuns.innerHTML = "<div style='color:var(--text-soft);font-size:12px'>No runs yet this week</div>";
+    const w = currentProfile.weekly;
+    if (!w || !w.runs) {
+        lbRuns.innerHTML = "<div style='color:var(--text-soft);font-size:12px;'>No runs yet</div>";
         return;
     }
-    const sorted = [...runs].sort((a, b) => b.score - a.score);
-    sorted.forEach(run => {
-        const div = document.createElement("div");
-        div.className = "lb-run-row";
-        const label = document.createElement("div");
-        label.className = "lb-run-label";
-        label.innerHTML = `<span>L${run.level}</span><span>${run.score} pts</span>`;
-        const bar = document.createElement("div");
-        bar.className = "lb-bar-outer";
-        const inner = document.createElement("div");
-        inner.className = "lb-bar-inner";
-        inner.style.background = getGradientForScore(run.score);
-        inner.style.width = `${(run.accuracy || 0)}%`;
-        bar.appendChild(inner);
-        div.appendChild(label);
-        div.appendChild(bar);
-        lbRuns.appendChild(div);
-    });
+
+    const sorted = [...w.runs].reverse();
+    const maxScore = Math.max(...w.runs.map(r => r.score), 1);
+
+    lbRuns.innerHTML = sorted.map(run => {
+        const pct = Math.round((run.score / maxScore) * 100);
+        return `
+            <div class="lb-run-row">
+                <div class="lb-run-label">
+                    <span>Level ${run.level}</span>
+                    <span>${run.score} pts</span>
+                </div>
+                <div class="lb-bar-outer">
+                    <div class="lb-bar-inner" style="width:${pct}%;background:var(--accent);"></div>
+                </div>
+            </div>
+        `;
+    }).join("");
 }
 
-function getGradientForScore(score) {
-    if (score >= 1500) return "#10b981";
-    if (score >= 500) return "#3b82f6";
-    return "#f59e0b";
-}
+function loadGlobalLeaderboard() {
+    const apiUrl = "https://api.example.com/leaderboard";
+    const lbGlobalList = document.getElementById("lb-global-list");
 
-function renderGlobalLeaderboard() {
-    const panel = document.getElementById("lb-panel-global");
-    const list = document.getElementById("lb-global-list");
-    list.innerHTML = '<div class="lb-loading">Loading…</div>';
-    
-    // Simulated global leaderboard with some example data
-    setTimeout(() => {
-        const data = [
-            { rank: 1, name: "ProPlayer", score: 8500, level: 24 },
-            { rank: 2, name: "SpeedRun", score: 7200, level: 22 },
-            { rank: 3, name: "ColorMaster", score: 6800, level: 21 },
-            { rank: 4, name: currentProfile.username, score: currentProfile.weekly.bestScore, level: currentProfile.weekly.bestLevel },
-            { rank: 5, name: "NewbieFocus", score: 2100, level: 12 }
-        ];
-        list.innerHTML = "";
-        data.forEach(item => {
-            const row = document.createElement("div");
-            row.className = "lb-global-row";
-            const rankEl = document.createElement("div");
-            rankEl.className = "lb-global-rank";
-            if (item.rank <= 3) rankEl.classList.add(`top${item.rank}`);
-            rankEl.textContent = `#${item.rank}`;
-            const nameEl = document.createElement("div");
-            nameEl.className = "lb-global-name";
-            if (item.name === currentProfile.username) nameEl.classList.add("me");
-            nameEl.textContent = item.name;
-            const scoreEl = document.createElement("div");
-            scoreEl.className = "lb-global-score";
-            scoreEl.textContent = item.score;
-            const levelEl = document.createElement("div");
-            levelEl.className = "lb-global-level";
-            levelEl.textContent = `L${item.level}`;
-            row.appendChild(rankEl);
-            row.appendChild(nameEl);
-            row.appendChild(scoreEl);
-            row.appendChild(levelEl);
-            list.appendChild(row);
+    lbGlobalList.innerHTML = "<div class='lb-loading'>Loading…</div>";
+
+    fetch(apiUrl)
+        .then(r => r.json())
+        .then(data => {
+            if (data.players && data.players.length > 0) {
+                lbGlobalList.innerHTML = data.players.map((p, i) => {
+                    const isMe = p.id === currentProfile.id;
+                    const rank = i + 1;
+                    let rankClass = "";
+                    if (rank === 1) rankClass = "top1";
+                    else if (rank === 2) rankClass = "top2";
+                    else if (rank === 3) rankClass = "top3";
+
+                    return `
+                        <div class="lb-global-row">
+                            <div class="lb-global-rank ${rankClass}">#${rank}</div>
+                            <div class="lb-global-name ${isMe ? "me" : ""}">${p.name}</div>
+                            <div class="lb-global-score">${p.score}</div>
+                            <div class="lb-global-level">L${p.level}</div>
+                        </div>
+                    `;
+                }).join("");
+            } else {
+                lbGlobalList.innerHTML = "<div class='lb-loading'>No data yet</div>";
+            }
+        })
+        .catch(() => {
+            lbGlobalList.innerHTML = "<div class='lb-loading'>Unable to load</div>";
         });
-    }, 800);
 }
 
-/* ACHIEVEMENTS */
-function renderAchievements() {
-    achListEl.innerHTML = "";
-    const achievements = currentProfile.achievements || [];
-    if (achievements.length === 0) {
-        achListEl.innerHTML = "<div style='color:var(--text-soft);font-size:13px'>No achievements yet. Keep playing!</div>";
+function submitRunToGlobalLeaderboard(score, level, pct) {
+    const apiUrl = "https://api.example.com/submit-run";
+    const payload = {
+        id: currentProfile.id,
+        name: currentProfile.username,
+        score,
+        level,
+        accuracy: pct
+    };
+
+    fetch(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    }).catch(() => {});
+}
+
+function showAchievements() {
+    if (!currentProfile.achievements || currentProfile.achievements.length === 0) {
+        achListEl.innerHTML = "<div style='color:var(--text-soft);font-size:12px;text-align:center;padding:20px;'>No medals yet. Keep playing!</div>";
+        achievementsOverlay.style.display = "flex";
         return;
     }
-    achievements.forEach(ach => {
-        const card = document.createElement("div");
-        card.className = `medal-card medal-${ach.medal}`;
-        const title = document.createElement("div");
-        title.className = "medal-title";
-        const emoji = ach.medal === "gold" ? "🥇" : ach.medal === "silver" ? "🥈" : "🥉";
-        title.innerHTML = `<span>${emoji}</span><span>${ach.medal.charAt(0).toUpperCase() + ach.medal.slice(1)} Medal</span>`;
-        const date = document.createElement("div");
-        date.className = "medal-date";
-        date.textContent = new Date(ach.weekStart).toLocaleDateString();
-        card.appendChild(title);
-        card.appendChild(date);
-        achListEl.appendChild(card);
-    });
+
+    achListEl.innerHTML = currentProfile.achievements.map(ach => {
+        const medalClass = `medal-${ach.medal}`;
+        const medal = ach.medal.charAt(0).toUpperCase() + ach.medal.slice(1);
+        const date = new Date(ach.weekStart).toLocaleDateString();
+
+        return `
+            <div class="medal-card ${medalClass}">
+                <div class="medal-title">🏅 ${medal} Medal</div>
+                <div class="medal-date">Week of ${date}</div>
+            </div>
+        `;
+    }).join("");
+
+    achievementsOverlay.style.display = "flex";
 }
 
 function switchLbTab(tab) {
@@ -1274,7 +1252,7 @@ function switchLbTab(tab) {
     const globalPanel = document.getElementById("lb-panel-global");
     const myTab = document.getElementById("lb-tab-my");
     const globalTab = document.getElementById("lb-tab-global");
-    
+
     if (tab === "my") {
         myPanel.classList.add("active");
         globalPanel.classList.remove("active");
@@ -1288,16 +1266,8 @@ function switchLbTab(tab) {
     }
 }
 
-function submitRunToGlobalLeaderboard(score, level, accuracy) {
-    // Placeholder for actual backend submission
-    console.log("Submitted run:", { score, level, accuracy });
-}
-
-/* INIT */
-window.onload = () => {
-    loadProfiles();
-    renderLeaderboard();
-};
+// Initialize
+loadProfiles();
 </script>
 </body>
 </html>
