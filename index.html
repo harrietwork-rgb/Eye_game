@@ -147,6 +147,54 @@ h1 {
   margin: 6px 0 4px;
 }
 
+  .combo-display {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+  padding: 6px 14px;
+  background: rgba(17, 24, 39, 0.72);
+  border-radius: 999px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease-out;
+  z-index: 999;
+}
+
+.combo-popup {
+  position: fixed;
+  top: 42%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.6);
+  font-size: 36px;
+  font-weight: 800;
+  color: #ffffff;
+  text-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
+  animation: comboPop 600ms ease-out forwards;
+  pointer-events: none;
+  z-index: 999;
+}
+
+@keyframes comboPop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.6);
+  }
+
+  40% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
 .grid {
   display: grid;
   gap: 6px;
@@ -436,8 +484,9 @@ button {
     </div>
   </div>
 
-  <div id="level-label">Level 1</div>
-  <div id="grid" class="grid"></div>
+<div id="level-label">Level 1</div>
+<div id="comboDisplay" class="combo-display">Combo x1</div>
+<div id="grid" class="grid"></div>
 
   <div class="controls">
     <button id="pause-btn" class="ghost">Pause</button>
@@ -550,6 +599,9 @@ let paused = false;
 let feedbackActive = false;
 let oddIndex = -1;
 let lastClickTime = null;
+let currentCombo = 0;
+let maxCombo = 0;
+let comboTimeout = null;
 
 let profilesData = null;
 let currentProfile = null;
@@ -822,7 +874,63 @@ function updateAccuracy() {
 function updateLives() {
   livesEl.textContent = "❤️".repeat(lives) + "🤍".repeat(3 - lives);
 }
+function onCorrectPick() {
+  currentCombo++;
 
+  if (currentCombo > maxCombo) {
+    maxCombo = currentCombo;
+  }
+
+  updateComboDisplay();
+
+  if (currentCombo >= 3) {
+    showComboPopup(currentCombo);
+  }
+
+  vibrate(20);
+}
+
+function onWrongPick() {
+  currentCombo = 0;
+  updateComboDisplay();
+}
+
+function updateComboDisplay() {
+  const el = document.getElementById("comboDisplay");
+  if (!el) return;
+
+  if (currentCombo <= 1) {
+    el.style.opacity = 0;
+    return;
+  }
+
+  el.textContent = `Combo x${currentCombo}`;
+  el.style.opacity = 1;
+
+  clearTimeout(comboTimeout);
+  comboTimeout = setTimeout(() => {
+    el.style.opacity = 0;
+  }, 1200);
+}
+
+function showComboPopup(combo) {
+  const popup = document.createElement("div");
+
+  popup.className = "combo-popup";
+  popup.textContent = `Combo x${combo}!`;
+
+  document.body.appendChild(popup);
+
+  setTimeout(() => {
+    popup.remove();
+  }, 600);
+}
+
+function vibrate(ms) {
+  if (navigator.vibrate) {
+    navigator.vibrate(ms);
+  }
+}
 function getGridSize(level) {
   if (level <= 2) return 2;
   if (level <= 4) return 3;
@@ -948,6 +1056,7 @@ function onTileClick(e) {
 
   if (index === oddIndex) {
     correct++;
+    onCorrectPick();
     addScoreForCorrectClick();
     updateAccuracy();
     moveToNextPuzzle();
@@ -957,6 +1066,7 @@ function onTileClick(e) {
   wrong++;
   lives--;
   feedbackActive = true;
+  onWrongPick();
 
   updateLives();
   updateAccuracy();
@@ -1002,6 +1112,9 @@ function startSession() {
   wrong = 0;
   lives = 3;
   lastClickTime = performance.now();
+  currentCombo = 0;
+  maxCombo = 0;
+  updateComboDisplay();
 
   scoreValueEl.textContent = score;
 
