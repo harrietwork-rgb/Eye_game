@@ -164,37 +164,6 @@ h1 {
   z-index: 999;
 }
 
-.combo-popup {
-  position: fixed;
-  top: 42%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0.6);
-  font-size: 36px;
-  font-weight: 800;
-  color: #ffffff;
-  text-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
-  animation: comboPop 600ms ease-out forwards;
-  pointer-events: none;
-  z-index: 999;
-}
-
-@keyframes comboPop {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.6);
-  }
-
-  40% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1.2);
-  }
-
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(1);
-  }
-}
-
 .grid {
   display: grid;
   gap: 6px;
@@ -883,10 +852,6 @@ function onCorrectPick() {
 
   updateComboDisplay();
 
-  if (currentCombo >= 3) {
-    showComboPopup(currentCombo);
-  }
-
   vibrate(20);
 }
 
@@ -911,19 +876,6 @@ function updateComboDisplay() {
   comboTimeout = setTimeout(() => {
     el.style.opacity = 0;
   }, 1200);
-}
-
-function showComboPopup(combo) {
-  const popup = document.createElement("div");
-
-  popup.className = "combo-popup";
-  popup.textContent = `Combo x${combo}!`;
-
-  document.body.appendChild(popup);
-
-  setTimeout(() => {
-    popup.remove();
-  }, 600);
 }
 
 function vibrate(ms) {
