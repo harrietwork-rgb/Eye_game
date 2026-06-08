@@ -1514,19 +1514,99 @@ button {
 
     if (state.mode === "relaxed") {
       showResultsOverlay(true);
-    } else if (window.explodeAllThenShowStats) {
+      
+ function endSession() {
+  // --- Keep this part: Your score and UI updates ---
+  clearInterval(sessionTimer);
+  gameActive = false;
+
+  const total = correct + wrong;
+  const pct = total === 0 ? 0 : Math.round((correct / total) * 100);
+
+  resultsScore.textContent = `Score: ${score}`;
+  resultsAccuracy.textContent = `Accuracy: ${pct}%`;
+  resultsLevel.textContent = `Level reached: ${level}`;
+  resultsBest.textContent = `Best score: ${bestScore}`;
+
+  recordWeeklyRun(score, level, pct);
+
+  startBtn.style.display = "inline-block";
+  pauseBtn.style.display = "none";
+  restartBtn.style.display = "none";
+  leaderboardBtn.style.display = "inline-block";
+  achievementsBtn.style.display = "inline-block";
+
+  // --- REMOVE the original explosion call ---
+  // window.explodeAllThenShowStats(() => {
+  //     resultsOverlay.style.display = "flex";
+  // }, {
+  //     selector: ".tile",
+  //     duration: 600,
+  //     distance: 300,
+  //     popBefore: true
+  // });
+
+  // --- ADD the custom explosion animation ---
+  const tiles = document.querySelectorAll('.tile');
+
+  if (tiles.length === 0) {
+    // No tiles, just show results overlay
+    document.getElementById("results-overlay").style.display = "flex";
+    return;
+  }
+
+  // Prepare tiles for explosion: remove classes, reset CSS vars
+  tiles.forEach(tile => {
+    tile.classList.remove("explode", "pop");
+    tile.style.setProperty("--tx", "0px");
+    tile.style.setProperty("--ty", "0px");
+    tile.style.setProperty("--rot", "0deg");
+  });
+
+  // Force reflow
+  void document.body.offsetWidth;
+
+  // Assign explosion parameters
+  tiles.forEach(tile => {
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 300 * (0.6 + Math.random() * 0.4);
+    const tx = Math.round(Math.cos(angle) * dist);
+    const ty = Math.round(Math.sin(angle) * dist);
+    const rot = Math.round((Math.random() - 0.5) * 360);
+
+    tile.style.setProperty("--tx", `${tx}px`);
+    tile.style.setProperty("--ty", `${ty}px`);
+    tile.style.setProperty("--rot", `${rot}deg`);
+  });
+
+  // Trigger explosion
+  setTimeout(() => {
+    tiles.forEach(tile => {
+      tile.classList.add("explode");
+    });
+  }, 50);
+
+  // Show results overlay after explosion
+  setTimeout(() => {
+    tiles.forEach(tile => {
+      tile.style.visibility = "hidden";
+    });
+    // Show overlay
+    document.getElementById("results-overlay").style.display = "flex";
+
+    // Optional: if you want to run the explosion animation callback
+    if (window.explodeAllThenShowStats) {
       window.explodeAllThenShowStats(() => {
-        showResultsOverlay(false);
+        document.getElementById("results-overlay").style.display = "flex";
       }, {
         selector: ".tile",
         duration: 600,
         distance: 300,
         popBefore: true
       });
-    } else {
-      showResultsOverlay(false);
     }
-  }
+  }, 700);
+}
 
   function tickTimer() {
     if (!state.running || state.paused) return;
