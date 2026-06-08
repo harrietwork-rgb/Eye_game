@@ -490,6 +490,13 @@ button {
 <div id="comboDisplay" class="combo-display">Combo x1</div>
 <div id="grid" class="grid"></div>
 
+<div class="mode-row">
+  <button class="ghost" onclick="setGameMode('relaxed')">Relaxed</button>
+  <button class="ghost" onclick="setGameMode('classic')">Classic</button>
+  <button class="ghost" onclick="setGameMode('extreme')">Extreme</button>
+  <button class="ghost" onclick="setGameMode('daily')">Daily</button>
+</div>
+  
   <div class="controls">
     <button id="pause-btn" class="ghost">Pause</button>
     <button id="restart-btn" class="ghost">Restart</button>
@@ -601,6 +608,9 @@ let paused = false;
 let feedbackActive = false;
 let oddIndex = -1;
 let lastClickTime = null;
+let gameMode = "classic";
+let dailyChallengeActive = false;
+let dailySeed = 1;
 let currentCombo = 0;
 let maxCombo = 0;
 let comboTimeout = null;
@@ -1036,7 +1046,41 @@ function getDelta(level) {
 function hsl(h, s, l) {
   return `hsl(${h}, ${s}%, ${l}%)`;
 }
+  
+function setDailySeed() {
+  const today = new Date().toISOString().slice(0, 10);
+  dailySeed = Array.from(today).reduce((sum, char) => sum + char.charCodeAt(0), 0);
+}
 
+function seededRandom() {
+  dailySeed = (dailySeed * 9301 + 49297) % 233280;
+  return dailySeed / 233280;
+}
+
+function gameRandom() {
+  return dailyChallengeActive ? seededRandom() : Math.random();
+}
+  
+function setGameMode(mode) {
+  if (gameActive) return;
+
+  gameMode = mode;
+  dailyChallengeActive = mode === "daily";
+
+  if (mode === "relaxed") {
+    sessionSeconds = 90;
+  } else if (mode === "classic") {
+    sessionSeconds = 60;
+  } else if (mode === "extreme") {
+    sessionSeconds = 30;
+  } else if (mode === "daily") {
+    sessionSeconds = 60;
+  }
+
+  showGameFlash(`${mode.toUpperCase()} mode`, 900);
+  updateTimer();
+}
+  
 function hideAllOverlays() {
   pauseOverlay.style.display = "none";
   resultsOverlay.style.display = "none";
@@ -1103,19 +1147,19 @@ function createPuzzle() {
   gridEl.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
   gridEl.innerHTML = "";
 
-  const baseH = Math.floor(Math.random() * 360);
-  const baseS = 40 + Math.random() * 30;
-  const baseL = 30 + Math.random() * 25;
+  const baseH = Math.floor(gameRandom() * 360);
+  const baseS = 40 + gameRandom() * 30;
+  const baseL = 30 + gameRandom() * 25;
 
   const delta = getDelta(level);
   const oddL = Math.min(baseL + delta, 95);
-  const oddH = (baseH + (Math.random() - 0.5) * 6 + 360) % 360;
+  const oddH = (baseH + (gameRandom() - 0.5) * 6 + 360) % 360;
 
   const baseCol = hsl(baseH, baseS, baseL);
   const oddCol = hsl(oddH, baseS, oddL);
 
   const total = size * size;
-  oddIndex = Math.floor(Math.random() * total);
+  oddIndex = Math.floor(gameRandom() * total);
 
   for (let i = 0; i < total; i++) {
     const tile = document.createElement("div");
@@ -1195,6 +1239,10 @@ function startSession() {
   clearInterval(sessionTimer);
   hideAllOverlays();
 
+  if (dailyChallengeActive) {
+  setDailySeed();
+}
+
   gameActive = true;
   paused = false;
   feedbackActive = false;
@@ -1203,7 +1251,9 @@ function startSession() {
   score = 0;
   correct = 0;
   wrong = 0;
-  lives = 3;
+  if (gameMode === "relaxed") lives = 5;
+  else if (gameMode === "extreme") lives = 1;
+  else lives = 3;
   currentCombo = 0;
   maxCombo = 0;
   lastClickTime = performance.now();
