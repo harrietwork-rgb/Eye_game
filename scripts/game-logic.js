@@ -3,6 +3,49 @@
 function endSession() {
     clearInterval(sessionTimer);
     gameActive = false;
+
+    function triggerTileExplosion() {
+  const tiles = document.querySelectorAll('.tile');
+
+  if (tiles.length === 0) return;
+
+  // Prepare tiles for explosion
+  tiles.forEach(tile => {
+    tile.classList.remove("explode", "pop");
+    tile.style.setProperty("--tx", "0px");
+    tile.style.setProperty("--ty", "0px");
+    tile.style.setProperty("--rot", "0deg");
+  });
+
+  // Force reflow
+  void document.body.offsetWidth;
+
+  // Assign explosion parameters
+  tiles.forEach(tile => {
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 300 * (0.6 + Math.random() * 0.4);
+    const tx = Math.round(Math.cos(angle) * dist);
+    const ty = Math.round(Math.sin(angle) * dist);
+    const rot = Math.round((Math.random() - 0.5) * 360);
+    tile.style.setProperty("--tx", `${tx}px`);
+    tile.style.setProperty("--ty", `${ty}px`);
+    tile.style.setProperty("--rot", `${rot}deg`);
+  });
+
+  // Trigger explosion
+  setTimeout(() => {
+    tiles.forEach(tile => {
+      tile.classList.add("explode");
+    });
+  }, 50);
+
+  // Hide tiles after explosion
+  setTimeout(() => {
+    tiles.forEach(tile => {
+      tile.style.visibility = "hidden";
+    });
+  }, 700);
+}
     
     const total = correct + wrong;
     const pct = total === 0 ? 0 : Math.round((correct / total) * 100);
