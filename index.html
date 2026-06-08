@@ -1514,20 +1514,20 @@ button {
 
     if (state.mode === "relaxed") {
       showResultsOverlay(true);
-      
-  if (window.explodeAllThenShowStats) {
-    window.explodeAllThenShowStats(() => {
-      showResultsOverlay(pct, total);
-    }, {
-      selector: ".tile",
-      duration: 600,
-      distance: 300,
-      popBefore: true
-    });
-  } else {
-    showResultsOverlay(pct, total);
+    } else if (window.explodeAllThenShowStats) {
+      window.explodeAllThenShowStats(() => {
+        showResultsOverlay(false);
+      }, {
+        selector: ".tile",
+        duration: 600,
+        distance: 300,
+        popBefore: true
+      });
+    } else {
+      showResultsOverlay(false);
+    }
   }
-}
+
   function tickTimer() {
     if (!state.running || state.paused) return;
 
