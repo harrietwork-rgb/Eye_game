@@ -20,15 +20,65 @@ function endSession() {
     leaderboardBtn.style.display = "inline-block";
     achievementsBtn.style.display = "inline-block";
     
-    // Show explosion effect
-    window.explodeAllThenShowStats(() => {
-        resultsOverlay.style.display = "flex";
-    }, {
+     window.explodeAllThenShowStats(() => {
+     resultsOverlay.style.display = "flex";
+   }, {
+      selector: ".tile",
+      duration: 600,
+      distance: 300,
+      popBefore: true
+  });
+}
+ const tiles = document.querySelectorAll('.tile');
+
+  if (tiles.length === 0) {
+    // No tiles, just show results overlay
+    document.getElementById("results-overlay").style.display = "flex";
+    return;
+  }
+ tiles.forEach(tile => {
+    tile.classList.remove("explode", "pop");
+    tile.style.setProperty("--tx", "0px");
+    tile.style.setProperty("--ty", "0px");
+    tile.style.setProperty("--rot", "0deg");
+  });
+void document.body.offsetWidth;
+
+ tiles.forEach(tile => {
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 300 * (0.6 + Math.random() * 0.4);
+    const tx = Math.round(Math.cos(angle) * dist);
+    const ty = Math.round(Math.sin(angle) * dist);
+    const rot = Math.round((Math.random() - 0.5) * 360);
+
+    tile.style.setProperty("--tx", `${tx}px`);
+    tile.style.setProperty("--ty", `${ty}px`);
+    tile.style.setProperty("--rot", `${rot}deg`);
+  });
+ setTimeout(() => {
+    tiles.forEach(tile => {
+      tile.classList.add("explode");
+    });
+  }, 50);
+
+ setTimeout(() => {
+    tiles.forEach(tile => {
+      tile.style.visibility = "hidden";
+    });
+
+ document.getElementById("results-overlay").style.display = "flex";
+
+ if (window.explodeAllThenShowStats) {
+      window.explodeAllThenShowStats(() => {
+        document.getElementById("results-overlay").style.display = "flex";
+      }, {
         selector: ".tile",
         duration: 600,
         distance: 300,
         popBefore: true
-    });
+      });
+    }
+  }, 700);
 }
 
 function submitRunToGlobalLeaderboard(score, level, pct) {
@@ -186,3 +236,4 @@ loadProfiles();
 startBtn.onclick = () => {
     startSession();
 };
+
