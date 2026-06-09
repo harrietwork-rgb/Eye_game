@@ -1543,12 +1543,10 @@ button {
     state.remaining -= 1;
     updateTimerUI();
 
- if (state.remaining <= 0) {
-  triggerTileExplosion(); // Call your explosion function here
-  setTimeout(() => {
-    endSession("time");
-  }, 700); // Wait for explosion animation to finish
-}
+    if (state.remaining <= 0) {
+      endSession("time");
+    }
+  }
 
   function startSession(nextMode = state.mode) {
     if (!MODE_CONFIG[nextMode]) nextMode = "classic";
